@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inbox</title>
+  <style>
+      body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Inbox</h1>
+  <ul id="messageList">
+    <!-- Pesan akan ditambahkan di sini oleh JavaScript -->
+  </ul>
+
+  <script>
+    // Ambil pesan dari server (perlu endpoint API terpisah)
+    async function fetchMessages() {
+      try {
+        const response = await fetch('/messages'); // Endpoint API untuk mengambil pesan
+        const messages = await response.json();
+
+        const messageList = document.getElementById('messageList');
+        messages.forEach(message => {
+          const li = document.createElement('li');
+          li.innerHTML = `<p>${message.content}</p><small>Sent at: ${new Date(message.createdAt).toLocaleString()}</small>`;
+          messageList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Gagal mengambil pesan:', error);
+        const messageList = document.getElementById('messageList');
+        messageList.innerHTML = `<p>Gagal mengambil pesan.</p>`;
+      }
+    }
+
+    fetchMessages();
+  </script>
+</body>
+</html>
