@@ -1,31 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>NGL Copy</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NGL Reimagined</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* style.css */
     body {
-      font-family: sans-serif;
-      margin: 20px;
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #000; /* Latar belakang gelap */
+      color: #eee; /* Teks abu-abu terang */
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden; /* Sembunyikan scrollbar jika tidak perlu */
     }
-    h1, h2 {
-      color: #333;
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.05); /* Latar belakang semi-transparan */
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5); /* Efek bayangan futuristik */
+      backdrop-filter: blur(10px); /* Efek blur di belakang container */
+      border: 1px solid rgba(255, 255, 255, 0.1); /* Border tipis */
+      max-width: 800px;
+      width: 90%;
     }
+
+    h1 {
+      font-size: 3em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(0, 200, 255, 0.7); /* Efek neon pada judul */
+    }
+
+    h2 {
+      font-size: 1.5em;
+      font-weight: 400;
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+
+    p {
+      font-size: 1.2em;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
     a {
-      color: blue;
+      color: #64b5f6; /* Warna biru futuristik */
       text-decoration: none;
+      padding: 12px 25px;
+      border: 1px solid #64b5f6;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      display: inline-block; /* Agar padding berfungsi */
+      margin: 0 10px; /* Spasi antar link */
     }
+
     a:hover {
-      text-decoration: underline;
+      background-color: #64b5f6;
+      color: #000;
+      box-shadow: 0 2px 20px rgba(100, 181, 246, 0.5); /* Efek hover yang lebih menonjol */
+    }
+
+    /* Efek Latar Belakang Partikel */
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1; /* Pastikan partikel di belakang konten */
+    }
+
+    /* Responsif */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.5em;
+      }
+      h2 {
+        font-size: 1.2em;
+      }
+      p {
+        font-size: 1em;
+      }
+      a {
+        padding: 10px 20px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>ngl copy</h1>
-  <h2>Welcome to my ngl.link copy</h2>
-  <p>
-    <a href="/create">Create your own link</a><br>
-    <a href="/view">View your messages</a><br>
-    <a href="/send">Send your own anonymous message</a>
-  </p>
+
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <h1>NGL Reimagined</h1>
+    <h2>Selamat Datang di Versi Masa Depan NGL.link!</h2>
+    <p>
+      Rasakan pengalaman mengirim dan menerima pesan anonim dengan cara yang baru. Dibuat dengan teknologi terkini dan desain futuristik.
+    </p>
+    <div>
+      <a href="/create">Buat Link Anda</a>
+      <a href="/view">Lihat Pesan Anda</a>
+      <a href="/send">Kirim Pesan Anonim</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": {
+          "value": 80,
+          "density": {
+            "enable": true,
+            "value_area": 800
+          }
+        },
+        "color": {
+          "value": "#64b5f6"
+        },
+        "shape": {
+          "type": "circle",
+          "stroke": {
+            "width": 0,
+            "color": "#000000"
+          },
+          "polygon": {
+            "nb_sides": 5
+          },
+          "image": {
+            "src": "img/github.svg",
+            "width": 100,
+            "height": 100
+          }
+        },
+        "opacity": {
+          "value": 0.5,
+          "random": false,
+          "anim": {
+            "enable": false,
+            "speed": 1,
+            "opacity_min": 0.1,
+            "sync": false
+          }
+        },
+        "size": {
+          "value": 3,
+          "random": true,
+          "anim": {
+            "enable": false,
+            "speed": 40,
+            "size_min": 0.1,
+            "sync": false
+          }
+        },
+        "line_linked": {
+          "enable": true,
+          "distance": 150,
+          "color": "#64b5f6",
+          "opacity": 0.4,
+          "width": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 6,
+          "direction": "none",
+          "random": false,
+          "straight": false,
+          "out_mode": "out",
+          "attract": {
+            "enable": false,
+            "rotateX": 600,
+            "rotateY": 1200
+          }
+        }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+          "onhover": {
+            "enable": true,
+            "mode": "grab"
+          },
+          "onclick": {
+            "enable": true,
+            "mode": "push"
+          },
+          "resize": true
+        },
+        "modes": {
+          "grab": {
+            "distance": 140,
+            "line_linked": {
+              "opacity": 1
+            }
+          },
+          "bubble": {
+            "distance": 400,
+            "size": 40,
+            "duration": 2,
+            "opacity": 8,
+            "speed": 3
+          },
+          "repulse": {
+            "distance": 200
+          },
+          "push": {
+            "particles_nb": 4
+          },
+          "remove": {
+            "particles_nb": 2
+          }
+        }
+      },
+      "retina_detect": true,
+      "config_demo": {
+        "hide_card": false,
+        "background_color": "#b61924",
+        "background_image": "",
+        "background_position": "50% 50%",
+        "background_repeat": "no-repeat",
+        "background_size": "cover"
+      }
+    });
+  </script>
 </body>
 </html>
