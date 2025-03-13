@@ -1,5 +1,5 @@
 {
-  "name": "chatbot-awanbrayy",
+  "name": "awanbrayy",
   "version": "1.0.0",
   "description": "A simple chatbot application using Node.js and Express.",
   "main": "server.js",
