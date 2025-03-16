@@ -1,108 +1,138 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const fs = require('fs').promises;
 const path = require('path');
-
 const app = express();
 const port = 3000;
 
-// Koneksi ke MongoDB
-// **PERINGATAN: JANGAN LAKUKAN INI DI APLIKASI PRODUKSI! SIMPAN KREDENSIAL DI VARIABEL LINGKUNGAN.**
-const MONGODB_URI = 'mongodb://localhost:27017/nglcopy'; // Ganti dengan string koneksi Anda
+app.use(express.json({ limit: '50mb' })); // Tingkatkan limit untuk data JSON (untuk base64)
+app.use(express.static(__dirname));
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Terhubung ke MongoDB'))
-  .catch(err => console.error('Gagal terhubung ke MongoDB', err));
+// --- Endpoint Kode (tidak banyak berubah) ---
 
-// Definisikan Skema Pesan
-const messageSchema = new mongoose.Schema({
-  content: String,
-  createdAt: { type: Date, default: Date.now }
+app.get('/api/kode', async (req, res) => {
+    try {
+        const data = await bacaData();
+        res.json(data.kode); // Hanya kirim array kode
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal membaca data kode.' });
+    }
 });
 
-const Message = mongoose.model('Message', messageSchema);
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname)));
-
-// Middleware untuk autentikasi sederhana (HANYA UNTUK CONTOH)
-const requireAuth = (req, res, next) => {
-  if (req.session.isAuthenticated) {
-    next();
-  } else {
-    res.redirect('/view');
-  }
-};
-
-// Route untuk halaman utama
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.post('/api/kode', async (req, res) => {
+    const { kode } = req.body;
+    if (!kode) {
+        return res.status(400).json({ message: 'Kode tidak boleh kosong.' });
+    }
+    try {
+        const data = await bacaData();
+        const id = Date.now();
+        const newData = { id, kode, timestamp: id };
+        data.kode.push(newData); // Masukkan ke array kode
+        await simpanData(data);
+        res.status(201).json(newData);
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menyimpan kode.' });
+    }
 });
 
-// Route untuk halaman inbox
-app.get('/inbox', requireAuth, async (req, res) => {
+app.delete('/api/kode/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const data = await bacaData();
+        data.kode = data.kode.filter(item => item.id !== id); // Filter array kode
+        await simpanData(data);
+        res.status(200).json({ message: 'Kode berhasil dihapus.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menghapus kode.' });
+    }
+});
+
+// --- Endpoint File (berubah total) ---
+
+app.get('/api/files', async (req, res) => {
+    try {
+        const data = await bacaData();
+        // Kirim data file yang relevan (id, originalname, timestamp)
+        const fileData = data.files.map(item => ({
+            id: item.id,
+            originalname: item.originalname,
+            timestamp: item.timestamp
+        }));
+        res.json(fileData);
+
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal membaca data file.' });
+    }
+});
+
+app.post('/api/files', async (req, res) => {
+    const { originalname, file } = req.body; // Ambil originalname dan data base64
+
+    if (!originalname || !file) {
+        return res.status(400).json({ message: 'Nama file dan data file diperlukan.' });
+    }
+
+    try {
+        const data = await bacaData();
+        const id = Date.now();
+        const newFileData = { id, originalname, file, timestamp: id }; // Simpan semua
+        data.files.push(newFileData);
+        await simpanData(data);
+        res.status(201).json({ id, originalname }); // Kirim kembali ID dan nama file
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menyimpan file.' });
+    }
+});
+
+// Endpoint untuk Mendapatkan File Tertentu untuk Didownload
+app.get('/api/files/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
   try {
-    // Ambil pesan dari database
-    const messages = await Message.find().sort({ createdAt: -1 });
+    const data = await bacaData();
+    const fileData = data.files.find((item) => item.id === id);
 
-    // Kirim data pesan ke inbox.html (perlu penanganan sisi klien)
-    res.sendFile(path.join(__dirname, 'inbox.html'));
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Terjadi kesalahan saat mengambil pesan.');
+    if (!fileData) {
+      return res.status(404).json({ message: 'File tidak ditemukan.' });
+    }
+    // Kirim data yang lengkap
+    res.status(200).json(fileData);
+
+  } catch (error) {
+     console.error(error); // Log error di server
+    res.status(500).json({ message: 'Gagal mengambil file.' });
   }
 });
 
-// Route untuk halaman "view" (login)
-app.get('/view', (req, res) => {
-  res.sendFile(path.join(__dirname, 'view.html'));
+app.delete('/api/files/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const data = await bacaData();
+        data.files = data.files.filter(item => item.id !== id); // Filter array files
+        await simpanData(data);
+        res.status(200).json({ message: 'File berhasil dihapus.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menghapus file.' });
+    }
 });
 
-app.post('/view', (req, res) => {
-  const password = req.body.pass;
+// --- Fungsi Bantu (sedikit perubahan) ---
+async function bacaData() {
+    try {
+        const data = await fs.readFile('data.json', 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            // Jika file belum ada, buat struktur data awal
+            return { kode: [], files: [] };
+        }
+        throw error;
+    }
+}
 
-  if (password === "rahasia") {
-    req.session.isAuthenticated = true;
-    res.redirect('/inbox');
-  } else {
-    res.sendFile(path.join(__dirname, 'view.html'));
-  }
-});
-
-// Route untuk menampilkan halaman "Send message"
-app.get('/send', (req, res) => {
-  res.sendFile(path.join(__dirname, 'send.html'));
-});
-
-// Route untuk memproses formulir "Send message"
-app.post('/send/inProgress', async (req, res) => {
-  const messageContent = req.body.message;
-
-  try {
-    // Simpan pesan ke database
-    const newMessage = new Message({ content: messageContent });
-    await newMessage.save();
-    res.redirect('/send');
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Terjadi kesalahan saat menyimpan pesan.');
-  }
-});
-
-app.get('/create', (req, res) => {
-    res.sendFile(path.join(__dirname, 'create.html'));
-});
-
-// Menggunakan Session
-const session = require('express-session');
-
-app.use(session({
-  secret: 'secretkey',
-  resave: false,
-  saveUninitialized: true
-}));
+async function simpanData(data) {
+    await fs.writeFile('data.json', JSON.stringify(data, null, 2), 'utf8');
+}
 
 app.listen(port, () => {
-  console.log(`Server berjalan di port ${port}`);
+    console.log(`Server berjalan di http://localhost:${port}`);
 });
