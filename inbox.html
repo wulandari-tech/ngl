@@ -1,53 +1,260 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Inbox</title>
-  <style>
-      body {
-      font-family: sans-serif;
-      margin: 20px;
-    }
-    h1 {
-      color: #333;
-    }
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    li {
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tambah Kode & File</title>
+    <style>
+        /* ... (CSS sebelumnya) ... */
+        /* ... CSS dari jawaban sebelumnya, tidak ada perubahan ... */
+    </style>
 </head>
 <body>
-  <h1>Inbox</h1>
-  <ul id="messageList">
-    <!-- Pesan akan ditambahkan di sini oleh JavaScript -->
-  </ul>
+    <h1>Halaman Admin</h1>
 
-  <script>
-    // Ambil pesan dari server (perlu endpoint API terpisah)
-    async function fetchMessages() {
-      try {
-        const response = await fetch('/messages'); // Endpoint API untuk mengambil pesan
-        const messages = await response.json();
+    <!-- Form untuk Kode (tetap) -->
+    <form id="form-kode">
+        <label for="kode">Masukkan Kode:</label>
+        <textarea id="kode" name="kode" placeholder="Tulis kode di sini..."></textarea>
+        <button type="submit">Bagikan Kode</button>
+    </form>
 
-        const messageList = document.getElementById('messageList');
-        messages.forEach(message => {
-          const li = document.createElement('li');
-          li.innerHTML = `<p>${message.content}</p><small>Sent at: ${new Date(message.createdAt).toLocaleString()}</small>`;
-          messageList.appendChild(li);
+     <div id="daftar-kode">
+        <h2>Daftar Kode</h2>
+        <!-- Daftar kode akan ditampilkan di sini -->
+    </div>
+
+    <!-- Form untuk Upload File -->
+    <form id="form-file" >
+        <label for="file">Pilih File:</label>
+        <input type="file" id="file" name="file">
+        <button type="submit">Upload File</button>
+    </form>
+
+    <div id="daftar-file">
+        <h2>Daftar File</h2>
+        <!-- Daftar file yang diupload akan ditampilkan di sini -->
+    </div>
+
+    <script>
+        // --- Bagian Kode (tidak berubah) ---
+        const formKode = document.getElementById('form-kode');
+        const daftarKode = document.getElementById('daftar-kode');
+
+         async function tampilkanDaftarKode() {
+            try {
+                const response = await fetch('/api/kode');  // Ganti dengan endpoint API Anda
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+              data.sort((a, b) => b.timestamp - a.timestamp);
+
+                daftarKode.innerHTML = ''; // Kosongkan dulu
+
+                data.forEach(item => {
+                    const kodeItem = document.createElement('div');
+                    kodeItem.classList.add('kode-item');
+
+                    const pre = document.createElement('pre');
+                    pre.textContent = item.kode;
+                    kodeItem.appendChild(pre);
+
+
+                    const tombolHapus = document.createElement('button');
+                    tombolHapus.textContent = 'Hapus';
+                    tombolHapus.classList.add('tombol-hapus');
+                    tombolHapus.addEventListener('click', async () => {
+                        // Konfirmasi sebelum menghapus
+                        if (confirm('Apakah Anda yakin ingin menghapus kode ini?')) {
+                           await hapusKode(item.id); // Panggil fungsi hapusKode
+                        }
+                    });
+                    kodeItem.appendChild(tombolHapus);
+                    daftarKode.appendChild(kodeItem);
+
+                });
+
+            } catch (error) {
+                console.error('Gagal mengambil daftar kode:', error);
+                 alert('Terjadi kesalahan saat mengambil daftar kode.');
+            }
+        }
+
+          // Fungsi untuk mengirim kode ke server
+        formKode.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const kode = document.getElementById('kode').value;
+            if (!kode.trim()) {
+              alert('Kode tidak boleh kosong!');
+              return;
+            }
+
+
+            try {
+                const response = await fetch('/api/kode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ kode }),
+                });
+
+              if (!response.ok) {
+                const errorData = await response.json(); // Coba ambil pesan error dari server
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+              }
+
+                // Bersihkan textarea setelah berhasil
+                document.getElementById('kode').value = '';
+              alert('Kode berhasil dibagikan!');
+                await tampilkanDaftarKode(); // Perbarui tampilan daftar kode
+            } catch (error) {
+                console.error('Gagal memposting kode:', error);
+                 alert(`Terjadi kesalahan: ${error.message}`);
+            }
         });
-      } catch (error) {
-        console.error('Gagal mengambil pesan:', error);
-        const messageList = document.getElementById('messageList');
-        messageList.innerHTML = `<p>Gagal mengambil pesan.</p>`;
-      }
-    }
 
-    fetchMessages();
-  </script>
+        // Fungsi untuk Hapus Kode
+        async function hapusKode(id) {
+            try {
+                const response = await fetch(`/api/kode/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+               alert('Kode berhasil dihapus!');
+                await tampilkanDaftarKode(); // Perbarui tampilan daftar kode
+            } catch (error) {
+                console.error('Gagal menghapus kode:', error);
+                alert('Terjadi kesalahan saat menghapus kode.');
+
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', tampilkanDaftarKode);
+
+
+        // --- Bagian File (berubah) ---
+        const formFile = document.getElementById('form-file');
+        const daftarFile = document.getElementById('daftar-file');
+
+        // Fungsi untuk Menampilkan Daftar file
+        async function tampilkanDaftarFile(){
+            try {
+                const response = await fetch('/api/files');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                data.sort((a, b) => b.timestamp - a.timestamp);
+
+                daftarFile.innerHTML = '';
+
+                data.forEach(item => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+
+                const namaFile = document.createElement('span');
+                namaFile.textContent = item.originalname; // Menampilkan originalname
+                fileItem.appendChild(namaFile);
+
+                const tombolHapusFile = document.createElement('button');
+                tombolHapusFile.textContent = 'Hapus';
+                tombolHapusFile.classList.add('tombol-hapus');
+                tombolHapusFile.addEventListener('click', async()=>{
+                    if(confirm('Apakah anda Yakin ingin menghapus file ini?')){
+                    await hapusFile(item.id)
+                    }
+                });
+                fileItem.appendChild(tombolHapusFile);
+                daftarFile.appendChild(fileItem)
+                });
+            } catch (error) {
+                console.error('Gagal mengambil daftar file:', error);
+                alert('Terjadi kesalahan saat mengambil daftar file.');
+            }
+        }
+
+        // Fungsi untuk menghapus file
+        async function hapusFile(id){
+            try {
+                const response = await fetch(`/api/files/${id}`,{
+                    method: 'DELETE',
+                });
+                if(!response.ok){
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                alert('file berhasil di hapus');
+                await tampilkanDaftarFile();
+            } catch (error) {
+                console.error('Gagal menghapus File:', error);
+                alert('Terjadi kesalahan saat menghapus File.');
+            }
+        }
+
+
+        // Event listener untuk form upload file
+        formFile.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Pilih file terlebih dahulu!');
+                return;
+            }
+
+            // Fungsi untuk membaca file sebagai base64
+            const readFileAsBase64 = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            };
+
+
+            try {
+                const base64String = await readFileAsBase64(file);
+
+                const response = await fetch('/api/files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        originalname: file.name, // Simpan nama file asli
+                        file: base64String,      // Kirim data base64
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+                }
+
+                 alert('File berhasil diupload!');
+                // Bersihkan input file setelah berhasil
+                fileInput.value = '';
+                await tampilkanDaftarFile(); //perbarui tampilan file
+
+            } catch (error) {
+                console.error('Gagal mengupload file:', error);
+                alert(`Terjadi kesalahan: ${error.message}`);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', tampilkanDaftarFile); //panggil fungsi ketika load
+
+    </script>
 </body>
 </html>
