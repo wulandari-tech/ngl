@@ -12,33 +12,61 @@
         #form-kode textarea, #form-file input[type="file"] { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; resize: vertical; min-height: 150px; }
         #form-kode button, #form-file button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
         #form-kode button:hover, #form-file button:hover { background-color: #45a049; }
-        .kode-item, .file-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px; background-color: #f9f9f9; display: flex; justify-content: space-between; align-items: center; }
+        .kode-item, .file-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between; /* Jarak antar elemen */
+            align-items: center; /* Pusatkan vertikal */
+            position: relative; /* Untuk posisi tombol hapus */
+        }
         #daftar-kode, #daftar-file { max-width: 600px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         #daftar-kode h2, #daftar-file h2 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        .tombol-hapus { background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .tombol-hapus { position: absolute; top: 5px; right: 5px; background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         .tombol-hapus:hover { background-color: #d32f2f; }
-        #form-kode input[type="text"], #form-file input[type="text"] { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-    </style>
+        #form-kode input[type="text"], #form-file input[type="text"] { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; } */
+        .info-admin {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 10px;
+        }
+        .kode-info, .file-info{
+           display: flex;
+          flex-direction: column;
+
+        }
+
+                                                                                                                                                                                                   </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <h1>DASHBOARD</h1>
+
     <form id="form-kode">
         <label for="judul-kode">Judul Kode:</label>
         <input type="text" id="judul-kode" name="judul-kode" placeholder="Judul kode...">
+
         <label for="kode">Masukkan Kode:</label>
         <textarea id="kode" name="kode" placeholder="Tulis kode di sini..."></textarea>
         <button type="submit">Bagikan Kode</button>
     </form>
+
     <div id="daftar-kode">
         <h2>Daftar Kode</h2>
     </div>
+
     <form id="form-file">
         <label for="judul-file">Judul File:</label>
         <input type="text" id="judul-file" name="judul-file" placeholder="Judul file...">
+
         <label for="file">Pilih File:</label>
         <input type="file" id="file" name="file">
         <button type="submit">Upload File</button>
     </form>
+
     <div id="daftar-file">
         <h2>Daftar File</h2>
     </div>
@@ -54,12 +82,31 @@
                 const data = await response.json();
                 data.sort((a, b) => b.timestamp - a.timestamp);
                 daftarKode.innerHTML = '';
+
                 data.forEach(item => {
                     const kodeItem = document.createElement('div');
                     kodeItem.classList.add('kode-item');
+
+                    // Bagian informasi (judul dan info copy)
+                    const kodeInfo = document.createElement('div');
+                    kodeInfo.classList.add('kode-info');
+
+                    const judulKode = document.createElement('h3');
+                    judulKode.textContent = item.judul;
+                    kodeInfo.appendChild(judulKode)
+
                     const pre = document.createElement('pre');
                     pre.textContent = item.kode;
-                    kodeItem.appendChild(pre);
+                    kodeInfo.appendChild(pre);
+
+                    const infoCopy = document.createElement('span');
+                    infoCopy.classList.add('info-admin');
+                    infoCopy.innerHTML = `<i class="fas fa-copy"></i> ${item.copyCount} salinan`; // Menggunakan Font Awesome
+                    kodeInfo.appendChild(infoCopy);
+
+                    kodeItem.appendChild(kodeInfo); // Tambah info ke item
+
+
                     const tombolHapus = document.createElement('button');
                     tombolHapus.textContent = 'Hapus';
                     tombolHapus.classList.add('tombol-hapus');
@@ -70,6 +117,7 @@
             } catch (error) { console.error('Gagal mengambil daftar kode:', error); alert('Terjadi kesalahan saat mengambil daftar kode.'); }
         }
 
+        // --- Fungsi untuk mengirim kode (tidak berubah) ---
         formKode.addEventListener('submit', async (event) => {
             event.preventDefault();
             const judul = document.getElementById('judul-kode').value;
@@ -85,6 +133,7 @@
             } catch (error) { console.error('Gagal memposting kode:', error); alert(`Terjadi kesalahan: ${error.message}`); }
         });
 
+        // --- Fungsi untuk menghapus kode (tidak berubah) ---
         async function hapusKode(id) {
             try {
                 const response = await fetch(`/api/kode/${id}`, { method: 'DELETE' });
@@ -94,19 +143,40 @@
             } catch (error) { console.error('Gagal menghapus kode:', error); alert('Terjadi kesalahan saat menghapus kode.'); }
         }
 
-        async function tampilkanDaftarFile() {
+        // --- Fungsi untuk menampilkan daftar file (dengan info download) ---
+          async function tampilkanDaftarFile() {
             try {
                 const response = await fetch('/api/files');
                 if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
                 const data = await response.json();
                 data.sort((a, b) => b.timestamp - a.timestamp);
                 daftarFile.innerHTML = '';
+
                 data.forEach(item => {
                     const fileItem = document.createElement('div');
                     fileItem.classList.add('file-item');
+
+                    // Bagian informasi
+                    const fileInfo = document.createElement('div');
+                    fileInfo.classList.add('file-info');
+
+
+                    const judulFile = document.createElement('h3'); // Judul
+                    judulFile.textContent = item.judul;
+                    fileInfo.appendChild(judulFile);
+
                     const namaFile = document.createElement('span');
                     namaFile.textContent = item.originalname;
-                    fileItem.appendChild(namaFile);
+                    fileInfo.appendChild(namaFile);
+
+                    const infoDownload = document.createElement('span');
+                    infoDownload.classList.add('info-admin');
+                    infoDownload.innerHTML = `<i class="fas fa-download"></i> ${item.downloadCount} unduhan`; // Font Awesome
+                    fileInfo.appendChild(infoDownload);
+
+                    fileItem.appendChild(fileInfo); // Tambah info ke item
+
+
                     const tombolHapusFile = document.createElement('button');
                     tombolHapusFile.textContent = 'Hapus';
                     tombolHapusFile.classList.add('tombol-hapus');
@@ -117,6 +187,7 @@
             } catch (error) { console.error('Gagal mengambil daftar file:', error); alert('Terjadi kesalahan saat mengambil daftar file.');}
         }
 
+        // --- Fungsi untuk menghapus file (tidak berubah) ---
         async function hapusFile(id) {
             try {
                 const response = await fetch(`/api/files/${id}`, { method: 'DELETE', });
@@ -126,6 +197,7 @@
             } catch (error) { console.error('Gagal menghapus File:', error); alert('Terjadi kesalahan saat menghapus File.'); }
         }
 
+        // --- Fungsi untuk mengupload file (tidak berubah) ---
         formFile.addEventListener('submit', async (event) => {
             event.preventDefault();
             const fileInput = document.getElementById('file');
@@ -160,11 +232,11 @@
 
             } catch (error) { console.error('Gagal mengupload file:', error); alert(`Terjadi kesalahan: ${error.message}`); }
         });
+        document.addEventListener('DOMContentLoaded', () => {
+          tampilkanDaftarKode()
+          tampilkanDaftarFile()
+        });
 
-      document.addEventListener('DOMContentLoaded', () => {
-        tampilkanDaftarKode()
-        tampilkanDaftarFile()
-      });
     </script>
 </body>
 </html>
