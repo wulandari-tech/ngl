@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Tambah Kode & File</title>
+    <title>KAIZEL - WANZOFC</title>
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; }
         h1 { text-align: center; }
@@ -21,40 +21,32 @@
     </style>
 </head>
 <body>
-    <h1>Halaman Admin</h1>
-
+    <h1>DASHBOARD</h1>
     <form id="form-kode">
         <label for="judul-kode">Judul Kode:</label>
         <input type="text" id="judul-kode" name="judul-kode" placeholder="Judul kode...">
-
         <label for="kode">Masukkan Kode:</label>
         <textarea id="kode" name="kode" placeholder="Tulis kode di sini..."></textarea>
         <button type="submit">Bagikan Kode</button>
     </form>
-
     <div id="daftar-kode">
         <h2>Daftar Kode</h2>
     </div>
-
     <form id="form-file">
         <label for="judul-file">Judul File:</label>
         <input type="text" id="judul-file" name="judul-file" placeholder="Judul file...">
-
         <label for="file">Pilih File:</label>
         <input type="file" id="file" name="file">
         <button type="submit">Upload File</button>
     </form>
-
     <div id="daftar-file">
         <h2>Daftar File</h2>
     </div>
-
     <script>
         const formKode = document.getElementById('form-kode');
         const daftarKode = document.getElementById('daftar-kode');
         const formFile = document.getElementById('form-file');
         const daftarFile = document.getElementById('daftar-file');
-
         async function tampilkanDaftarKode() {
             try {
                 const response = await fetch('/api/kode');
