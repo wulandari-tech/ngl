@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEMPLATE KHUSUS HTML ZONE</title>
+    <title>template htmlzone</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Roboto Mono', monospace; background-color: #000; color: #fff; line-height: 1.6; overflow-x: hidden;  padding-bottom: 50px;}
-        h1, h2 { font-family: 'Poppins', sans-serif; text-align: center; margin-bottom: 1rem; color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
-        h1 { font-size: 2.5rem; margin-top: 2rem; margin-bottom: 2rem;}
-        #container-utama, #container-file { display: flex; flex-direction: column; gap: 2rem; padding: 20px; max-width: 900px; margin: 0 auto; }
-        .kontainer-kode { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); }
-        .kontainer-kode:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
-        .kontainer-kode pre { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; max-height: 150px; /* Batasi tinggi awal */ overflow: hidden; /* Sembunyikan konten yang berlebih */ transition: max-height 0.5s ease; /* Animasi transisi */ }
-        .kontainer-kode.expanded pre { max-height: 1000px; /* Tinggi maksimum saat expanded */}
-        .kontainer-kode .tombol-copy { position: absolute; top: 10px; right: 10px; background-color: #00ffff; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s, transform 0.3s; }
-        .kontainer-kode .tombol-copy:hover { background-color: #00d1d1; transform: scale(1.05); }
-        .kontainer-kode .judul-kode { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
-        .kontainer-file { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-bottom: 1rem;}
-        .kontainer-file:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
-        .kontainer-file .file-link { color: #00ffff; text-decoration: none; font-weight: bold; display: inline-block; transition: color 0.3s, transform 0.3s; }
-        .kontainer-file .file-link::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 8px; }
-        .kontainer-file .file-link:hover { color: #00d1d1; transform: translateX(5px); }
-        .kontainer-file .judul-file { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
-        .swiper-container { width: 100%; }
-        .swiper-slide { display: flex; justify-content: center; align-items: center; }
-        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
-        .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
-        .modal-konten { background-color: #111; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; border-radius: 8px; position: relative; }
-        .modal-konten pre{ white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; }
-        .tutup-modal { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .tutup-modal:hover, .tutup-modal:focus { color: #fff; text-decoration: none; }
-        .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s, color 0.3s; display: block; margin: 10px auto 0; }
-        .tombol-load-more:hover { background-color: #00ffff; color: #000; }
-        .judul-kode-modal, .judul-file-modal {
-          font-size: 1.5rem;
-          color: #00ffff;
-          margin-bottom: 1rem;
-          border-bottom: 2px solid rgba(0, 255, 255, 0.5);
-          padding-bottom: 0.5rem;
-        }
-
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Roboto Mono', monospace; background-color: #000; color: #fff; line-height: 1.6; overflow-x: hidden;  padding-bottom: 50px;}
+      h1, h2 { font-family: 'Poppins', sans-serif; text-align: center; margin-bottom: 1rem; color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+      h1 { font-size: 2.5rem; margin-top: 2rem; margin-bottom: 2rem;}
+      #container-utama, #container-file { display: flex; flex-direction: column; gap: 2rem; padding: 20px; max-width: 900px; margin: 0 auto; }
+      .kontainer-kode { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); }
+      .kontainer-kode:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-kode pre { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; max-height: 150px; overflow: hidden; transition: max-height 0.5s ease; }
+      .kontainer-kode.expanded pre { max-height: 1000px;}
+      .kontainer-kode .tombol-copy { position: absolute; top: 10px; right: 10px; background-color: #00ffff; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s, transform 0.3s; }
+      .kontainer-kode .tombol-copy:hover { background-color: #00d1d1; transform: scale(1.05); }
+      .kontainer-kode .judul-kode { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      .kontainer-file { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-bottom: 1rem;}
+      .kontainer-file:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-file .file-link { color: #00ffff; text-decoration: none; font-weight: bold; display: inline-block; transition: color 0.3s, transform 0.3s; }
+      .kontainer-file .file-link::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 8px; }
+      .kontainer-file .file-link:hover { color: #00d1d1; transform: translateX(5px); }
+      .kontainer-file .judul-file { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      .swiper-container { width: 100%; }
+      .swiper-slide { display: flex; justify-content: center; align-items: center; }
+      #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+      .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
+      .modal-konten { background-color: #111; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; border-radius: 8px; position: relative; }
+      .modal-konten pre{ white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; }
+      .tutup-modal { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+      .tutup-modal:hover, .tutup-modal:focus { color: #fff; text-decoration: none; }
+      .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s, color 0.3s; display: block; margin: 10px auto 0; }
+      .tombol-load-more:hover { background-color: #00ffff; color: #000; }
+      .judul-kode-modal, .judul-file-modal { font-size: 1.5rem; color: #00ffff; margin-bottom: 1rem; border-bottom: 2px solid rgba(0, 255, 255, 0.5); padding-bottom: 0.5rem;}
+      .info-count { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; }
+      .copy-count, .download-count { margin-left: 10px; }
+      .copy-count::before { content: '\f0c5'; /* Font Awesome icon for copy */ font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .download-count::before { content: '\f019'; /* Font Awesome icon for download */ font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
 
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
-    <h1>template html</h1>
-    <div id="container-utama"></div>
-    <h1>special file </h1>
+    <h1>TEMPLATE HTML</h1>
+   <div id="container-utama"></div>
+
+    <h1>FOR FILE</h1>
     <div id="container-file"></div>
     <div id="modal-kode" class="modal">
         <div class="modal-konten">
@@ -60,11 +58,14 @@
             <pre></pre>
         </div>
     </div>
+
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
     <script>
       particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, }, "opacity": { "value": 0.7, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } }, "retina_detect": true });
+
         const modal = document.getElementById('modal-kode');
         const tutupModal = document.querySelector('.tutup-modal');
         const modalPre = document.querySelector('#modal-kode pre');
@@ -73,6 +74,7 @@
         tutupModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (event) => { if (event.target === modal) { modal.style.display = 'none'; } });
 
+        // --- Fungsi untuk membuat kontainer kode ---
         function buatKontainerKode(item) {
             const containerUtama = document.getElementById('container-utama');
             const kontainerKode = document.createElement('div');
@@ -87,13 +89,11 @@
             pre.textContent = item.kode;
             kontainerKode.appendChild(pre);
 
-            // Cek apakah perlu tombol "Load More"
-            if (item.kode.length > 200) { // Ganti 200 dengan panjang yang kamu inginkan
+            if (item.kode.length > 200) {
                 const tombolLoadMore = document.createElement('button');
                 tombolLoadMore.textContent = 'Load More';
                 tombolLoadMore.classList.add('tombol-load-more');
                 tombolLoadMore.addEventListener('click', () => {
-                    // Tampilkan modal
                     modalPre.textContent = item.kode;
                     judulModal.textContent = item.judul;
                     modal.style.display = 'block';
@@ -101,21 +101,45 @@
                 kontainerKode.appendChild(tombolLoadMore);
             }
 
-
             const tombolCopy = document.createElement('button');
             tombolCopy.textContent = 'Copy';
             tombolCopy.classList.add('tombol-copy');
-            tombolCopy.addEventListener('click', () => {
-                navigator.clipboard.writeText(item.kode).then(() => {
+            tombolCopy.addEventListener('click', async () => { // Jadikan async
+                try {
+                    await navigator.clipboard.writeText(item.kode);
                     gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
                     alert('Kode berhasil disalin!');
-                }).catch(err => { console.error('Gagal menyalin:', err); });
+
+                    // Kirim request untuk update copyCount
+                    const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
+                    if (response.ok) {
+                         const data = await response.json();
+                         // Update tampilan copyCount (cari elemen yang sesuai)
+                         const copyCountEl = kontainerKode.querySelector('.copy-count');
+                        if (copyCountEl) {
+                          copyCountEl.textContent = data.count;
+                        }
+                    }
+
+                } catch (err) {
+                    console.error('Gagal menyalin atau update count:', err);
+                }
             });
             kontainerKode.appendChild(tombolCopy);
+
+            // Tambahkan tampilan copyCount
+            const infoCount = document.createElement('div');
+            infoCount.classList.add('info-count');
+            const copyCount = document.createElement('span');
+            copyCount.classList.add('copy-count');
+            copyCount.textContent = item.copyCount;  // Tampilkan nilai awal
+            infoCount.appendChild(copyCount);
+            kontainerKode.appendChild(infoCount);
+
+
             containerUtama.appendChild(kontainerKode);
             gsap.from(kontainerKode, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out" });
         }
-
         async function ambilDataKode() {
             try {
                 const response = await fetch('/api/kode');
@@ -125,23 +149,21 @@
                 data.forEach(item => { buatKontainerKode(item); });
             } catch (error) { console.error('Gagal mengambil data:', error); }
         }
-
         function buatKontainerFile(item) {
           const containerFile = document.getElementById('container-file');
           const kontainerFile = document.createElement('div');
           kontainerFile.classList.add('kontainer-file');
 
-          const judulFile = document.createElement('h2'); // Tambah elemen untuk judul
+          const judulFile = document.createElement('h2');
           judulFile.textContent = item.judul;
-          judulFile.classList.add('judul-file'); // Tambah class untuk styling
+          judulFile.classList.add('judul-file');
           kontainerFile.appendChild(judulFile);
-
 
           const fileLink = document.createElement('a');
           fileLink.textContent = item.originalname;
           fileLink.href = '#';
           fileLink.classList.add('file-link');
-          fileLink.addEventListener('click', async (event) => {
+          fileLink.addEventListener('click', async (event) => { //Jadikan async
             event.preventDefault();
             try{
               const response = await fetch(`/api/files/${item.id}`);
@@ -151,13 +173,28 @@
               link.href = fileData.file;
               link.download = fileData.originalname;
               link.click();
-            }catch(error){ console.error('Gagal mendownload file:', error); alert('Terjadi kesalahan saat mendownload file.');}
+              const downloadResponse = await fetch(`/api/files/${item.id}/download`, { method: 'POST' });
+              if (downloadResponse.ok) {
+                const downloadData = await downloadResponse.json();
+                const downloadCountEl = kontainerFile.querySelector('.download-count');
+                if(downloadCountEl){
+                    downloadCountEl.textContent = downloadData.count;
+                }
+              }
+
+            }catch(error){ console.error('Gagal mendownload file atau update count:', error); alert('Terjadi kesalahan.');}
           });
           kontainerFile.appendChild(fileLink);
-          containerFile.appendChild(kontainerFile);
+          const infoCount = document.createElement('div');
+          infoCount.classList.add('info-count');
+          const downloadCount = document.createElement('span');
+          downloadCount.classList.add('download-count');
+          downloadCount.textContent = item.downloadCount; // Tampilkan nilai awal
+          infoCount.appendChild(downloadCount);
+          kontainerFile.appendChild(infoCount);
+          containerFile.appendChild(kontainerFile); // Append kontainerFile ke containerFile
           gsap.from(kontainerFile, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out", delay: 0.2 });
         }
-
         async function ambilDataFile() {
             try {
                 const response = await fetch('/api/files');
@@ -166,8 +203,7 @@
                 data.sort((a, b) => b.timestamp - a.timestamp);
                 data.forEach(item => { buatKontainerFile(item); });
             } catch (error) { console.error('Gagal mengambil data:', error); }
-        }
-
+        } 
         document.addEventListener('DOMContentLoaded', () => {
             ambilDataKode();
             ambilDataFile();
