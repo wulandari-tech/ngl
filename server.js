@@ -6,6 +6,12 @@ const port = 3000;
 
 app.use(express.json({ limit: '50mb' })); // Tingkatkan limit untuk data JSON (untuk base64)
 app.use(express.static(__dirname));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
+});
+app.get('/wanzbrayy', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
+});
 
 // --- Endpoint Kode (tidak banyak berubah) ---
 
