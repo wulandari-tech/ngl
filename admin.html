@@ -153,7 +153,7 @@
                 }
                 if (fileData.length > 0) {
                     fileData.sort((a, b) => b.timestamp - a.timestamp);
-                    fileTerbaruEl.textContent = fileData[0].judul;
+                    fileTerbaruEl.textContent = fileData[0].filename; // Menampilkan nama file terbaru.
                 }
 
             } catch (error) { console.error('Error updating dashboard:', error); }
@@ -224,6 +224,8 @@
                 document.getElementById('judul-kode').value = '';
                 alert('Kode berhasil dibagikan!');
                 await tampilkanDaftarKode();
+                await updateDashboard(); // Update dashboard setelah menambah kode
+
             } catch (error) { console.error('Gagal memposting kode:', error); alert(`Terjadi kesalahan: ${error.message}`); }
         });
 
@@ -234,6 +236,7 @@
                 if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
                 alert('Kode berhasil dihapus!');
                 await tampilkanDaftarKode();
+                await updateDashboard(); // Update dashboard setelah menghapus
             } catch (error) { console.error('Gagal menghapus kode:', error); alert('Terjadi kesalahan saat menghapus kode.'); }
         }
 
@@ -263,16 +266,16 @@
 
 
                     const judulFile = document.createElement('h3'); // Judul
-                    judulFile.textContent = item.judul;
+                    judulFile.textContent = item.filename; // Use filename
                     fileInfo.appendChild(judulFile);
 
                     const namaFile = document.createElement('span');
-                    namaFile.textContent = item.originalname;
+                    namaFile.textContent = item.filename; // Use filename
                     fileInfo.appendChild(namaFile);
 
                     const infoDownload = document.createElement('span');
                     infoDownload.classList.add('info-admin');
-                    infoDownload.innerHTML = `<i class="fas fa-download"></i> ${item.downloadCount} unduhan`; // Font Awesome
+                    infoDownload.innerHTML = `<i class="fas fa-download"></i> ${item.likes} Likes`; // Font Awesome  // Use Likes
                     fileInfo.appendChild(infoDownload);
 
                     itemDetails.appendChild(fileInfo); // Tambah info ke item
@@ -296,6 +299,8 @@
                 if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
                 alert('file berhasil di hapus');
                 await tampilkanDaftarFile();
+                await updateDashboard(); // Update dashboard
+
             } catch (error) { console.error('Gagal menghapus File:', error); alert('Terjadi kesalahan saat menghapus File.'); }
         }
 
@@ -307,30 +312,25 @@
             const judulFile = document.getElementById('judul-file').value;
 
             if (!file) { alert('Pilih file terlebih dahulu!'); return; }
-             if (!judulFile) { alert('Masukan Judul File terlebih dahulu!'); return; }
+            if (!judulFile.trim()) { alert('Judul File Tidak Boleh Kosong'); return; }
 
-            const readFileAsBase64 = (file) => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            };
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('filename', file.name); // Tambah filename
+            formData.append('judul', judulFile); // Tambah Judul File
+            // --- HAPUS YANG BERKAITAN DENGAN BASE64 ---
 
             try {
-                const base64String = await readFileAsBase64(file);
-                const response = await fetch('/api/files', {
+                const response = await fetch('/api/files', {  // Tetap ke /api/files
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ originalname: file.name, file: base64String, judul: judulFile }),
+                    body: formData, // Kirim FormData langsung
                 });
-
                 if (!response.ok) { const errorData = await response.json(); throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`); }
                 alert('File berhasil diupload!');
-                fileInput.value = '';
-                document.getElementById('judul-file').value = '';
-                await tampilkanDaftarFile();
+                fileInput.value = ''; // Reset input file
+                 document.getElementById('judul-file').value = '';
+                await tampilkanDaftarFile(); // Refresh daftar file
+                await updateDashboard(); // Update dashboard
 
             } catch (error) { console.error('Gagal mengupload file:', error); alert(`Terjadi kesalahan: ${error.message}`); }
         });
