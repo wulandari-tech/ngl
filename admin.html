@@ -1,347 +1,236 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wanzofc - Dashboard</title>
+    <title>Admin - Code Share</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- <link rel="stylesheet" href="style.css"> --> <!-- Jika Anda memisahkan CSS -->
+
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; }
-        h1 { text-align: center; }
-        /* ... (CSS Form dan Daftar, tidak banyak berubah) ... */
+        /* CSS Reset (Minimal) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 1100px; margin: auto; padding: 20px; }
+        header { background: #333; color: #fff; padding: 1rem 0; text-align: center; }
+        h1 { margin-bottom: 20px; }
+        #add-kode-form { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color:#fff; }
+        #add-kode-form input, #add-kode-form textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        #add-kode-form button { background-color: #333; color: #fff; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        #add-kode-form button:hover{ background-color: #111;}
+        #kode-list { margin-top: 20px;}
+        .kode-item { border: 1px solid #ddd; padding: 15px; margin-bottom:15px; border-radius: 5px; background-color: #fff; }
+        .kode-item h2 { margin-bottom: 10px; font-size: 1.2em; }
+        .kode-item pre { background-color: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; white-space: pre-wrap; }
+        .kode-item .meta { font-size: 0.8em; color: #666; margin-top: 10px; }
+        .kode-item .actions { margin-top: 10px; }
+        .kode-item .actions button { background-color: #dc3545; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right:5px;}
+        .kode-item .actions button:hover{opacity: 0.8;}
 
-        /* --- Dashboard Styles --- */
-        #dashboard { max-width: 800px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-        #dashboard h2 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        .dashboard-stat { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        .dashboard-stat strong { color: #333; }
-        #grafik-aktivitas { /* Tambahkan styling untuk grafik jika Anda menggunakannya */ }
-
-        /* Gaya untuk item kode dan file */
-        .kode-item, .file-item {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: space-between; /* Jarak antar elemen */
-            align-items: center; /* Pusatkan vertikal */
-            position: relative; /* Untuk posisi tombol hapus */
+         /* Dark Mode Styles (Optional) */
+        body.dark-mode { background-color: #121212; color: #eee; }
+        body.dark-mode #add-kode-form { background-color: #222; border-color: #444; }
+        body.dark-mode .kode-item { background-color: #222; border-color: #444; }
+        body.dark-mode .kode-item pre { background-color: #333; }
+       .dark-mode-toggle {
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          background-color: #000; /* Hitam Pekat */
+          color: #fff;
+          border: none;
+          padding: 5px 10px;
+          border-radius: 50%; /* Bentuk lingkaran */
+          cursor: pointer;
+          font-size: 1.5em; /* Ukuran emoji */
+          line-height: 1; /* Pusatkan emoji */
         }
-        /* ... (CSS Form dan Daftar, tidak banyak berubah) ... */
-          #form-kode, #form-file { display: flex; flex-direction: column; max-width: 600px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-        #form-kode label, #form-file label { margin-bottom: 5px; font-weight: bold; }
-        #form-kode textarea, #form-file input[type="file"] { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; resize: vertical; min-height: 150px; }
-        #form-kode button, #form-file button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        #form-kode button:hover, #form-file button:hover { background-color: #45a049; }
-
-        #daftar-kode, #daftar-file { max-width: 600px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        #daftar-kode h2, #daftar-file h2 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        .tombol-hapus { position: absolute; top: 5px; right: 5px; background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .tombol-hapus:hover { background-color: #d32f2f; }
-        #form-kode input[type="text"], #form-file input[type="text"] { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-
-        /* Gaya untuk menampilkan info copy dan download */
-        .info-admin {
-            font-size: 0.9rem;
-            color: #666;
-            margin-left: 10px;
-        }
-        .kode-info, .file-info{
-           display: flex;
-          flex-direction: column;
-
-        }
-        .list-item-container {
-            display: flex;
-            flex-direction: row; /* Menyusun item secara horizontal */
-            align-items: center; /* Pusatkan item secara vertikal */
-            justify-content: space-between; /* Beri ruang di antara item */
-            width: 100%; /* Pastikan container memenuhi lebar */
-            padding: 10px;
-            border-bottom: 1px solid #ddd; /* Garis pemisah antar item */
-        }
-
-        .list-item-container:last-child {
-            border-bottom: none; /* Hilangkan garis pada item terakhir */
-        }
-        .item-details {
-            flex-grow: 1; /* Memungkinkan detail item untuk mengisi ruang yang tersedia */
-            margin-right: 10px; /* Beri jarak dari tombol */
+        body.dark-mode .dark-mode-toggle {
+            background-color: #fff;
+            color: #000;
         }
 
     </style>
-     <!-- Font Awesome (jika ingin ikon) -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <h1>Halaman Admin</h1>
-
-    <!-- Dashboard -->
-    <div id="dashboard">
-        <h2>Dashboard</h2>
-        <div class="dashboard-stat">
-            <span>Total Kode:</span>
-            <strong id="total-kode">0</strong>
+    <header>
+        <div class="container">
+            <h1>Admin - Code Share</h1>
         </div>
-        <div class="dashboard-stat">
-            <span>Total File:</span>
-            <strong id="total-file">0</strong>
-        </div>
-        <div class="dashboard-stat">
-            <span>Kode Terbaru:</span>
-            <strong id="kode-terbaru">-</strong>
-        </div>
-        <div class="dashboard-stat">
-            <span>File Terbaru:</span>
-            <strong id="file-terbaru">-</strong>
-        </div>
-        <!-- Tambah statistik lain jika perlu -->
+    </header>
+     <main class="container">
+       <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+            <span id="dark-mode-icon">🌙</span>
+        </button>
 
-    </div>
+        <section id="add-kode-form">
+            <h2>Tambah Kode Baru</h2>
+            <input type="text" id="judul-input" placeholder="Judul Kode">
+            <textarea id="kode-input" placeholder="Kode..."></textarea>
+            <button onclick="addKode()">Tambahkan Kode</button>
+        </section>
 
-    <form id="form-kode">
-      <label for="judul-kode">Judul Kode:</label>
-      <input type="text" id="judul-kode" name="judul-kode" placeholder="Judul kode...">
-      <label for="kode">Masukkan Kode:</label>
-      <textarea id="kode" name="kode" placeholder="Tulis kode di sini..."></textarea>
-      <button type="submit">Bagikan Kode</button>
-    </form>
-
-    <div id="daftar-kode">
-        <h2>Daftar Kode</h2>
-    </div>
-
-    <form id="form-file">
-        <label for="judul-file">Judul File:</label>
-        <input type="text" id="judul-file" name="judul-file" placeholder="Judul file...">
-        <label for="file">Pilih File:</label>
-        <input type="file" id="file" name="file">
-        <button type="submit">Upload File</button>
-    </form>
-
-    <div id="daftar-file">
-        <h2>Daftar File</h2>
-    </div>
+        <section id="kode-list">
+            <h2>Daftar Kode</h2>
+            <!-- Daftar kode akan ditampilkan di sini -->
+        </section>
+    </main>
 
     <script>
-        const formKode = document.getElementById('form-kode');
-        const daftarKode = document.getElementById('daftar-kode');
-        const formFile = document.getElementById('form-file');
-        const daftarFile = document.getElementById('daftar-file');
-        const totalKodeEl = document.getElementById('total-kode');
-        const totalFileEl = document.getElementById('total-file');
-        const kodeTerbaruEl = document.getElementById('kode-terbaru');
-        const fileTerbaruEl = document.getElementById('file-terbaru');
-
-        // --- Fungsi Dashboard ---
-        async function updateDashboard() {
-            try {
-                const kodeResponse = await fetch('/api/kode');
-                const fileResponse = await fetch('/api/files');
-                if (!kodeResponse.ok || !fileResponse.ok) { throw new Error('Gagal mengambil data dashboard.'); }
-
-                const kodeData = await kodeResponse.json();
-                const fileData = await fileResponse.json();
-
-                totalKodeEl.textContent = kodeData.length;
-                totalFileEl.textContent = fileData.length;
-
-                if (kodeData.length > 0) {
-                    kodeData.sort((a, b) => b.timestamp - a.timestamp);
-                    kodeTerbaruEl.textContent = kodeData[0].judul;
-                }
-                if (fileData.length > 0) {
-                    fileData.sort((a, b) => b.timestamp - a.timestamp);
-                    fileTerbaruEl.textContent = fileData[0].judul;
-                }
-
-            } catch (error) { console.error('Error updating dashboard:', error); }
-        }
-
-       // --- Fungsi untuk menampilkan daftar kode (dengan info copy) ---
-        async function tampilkanDaftarKode() {
+       // Fungsi untuk mengambil data kode dari API
+        async function getKode() {
             try {
                 const response = await fetch('/api/kode');
-                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`);}
                 const data = await response.json();
-                data.sort((a, b) => b.timestamp - a.timestamp);
-                daftarKode.innerHTML = '';
-
-                data.forEach(item => {
-                  const listItemContainer = document.createElement('div');
-                  listItemContainer.classList.add('list-item-container');
-
-                  // Kontainer untuk detail item
-                  const itemDetails = document.createElement('div');
-                  itemDetails.classList.add('item-details');
-
-                    const kodeItem = document.createElement('div');
-                    kodeItem.classList.add('kode-item');
-
-                    // Bagian informasi (judul dan info copy)
-                    const kodeInfo = document.createElement('div');
-                    kodeInfo.classList.add('kode-info');
-
-                    const judulKode = document.createElement('h3');
-                    judulKode.textContent = item.judul;
-                    kodeInfo.appendChild(judulKode)
-
-                    const pre = document.createElement('pre');
-                    pre.textContent = item.kode;
-                    kodeInfo.appendChild(pre);
-
-                    const infoCopy = document.createElement('span');
-                    infoCopy.classList.add('info-admin');
-                    infoCopy.innerHTML = `<i class="fas fa-copy"></i> ${item.copyCount} salinan`; // Menggunakan Font Awesome
-                    kodeInfo.appendChild(infoCopy);
-
-                    itemDetails.appendChild(kodeInfo); // Tambah info ke item
-                    listItemContainer.appendChild(itemDetails)
-
-
-                    const tombolHapus = document.createElement('button');
-                    tombolHapus.textContent = 'Hapus';
-                    tombolHapus.classList.add('tombol-hapus');
-                    tombolHapus.addEventListener('click', async () => { if (confirm('Apakah Anda yakin ingin menghapus kode ini?')) { await hapusKode(item.id); } });
-                    listItemContainer.appendChild(tombolHapus);
-
-                    daftarKode.appendChild(listItemContainer);
-                });
-            } catch (error) { console.error('Gagal mengambil daftar kode:', error); alert('Terjadi kesalahan saat mengambil daftar kode.'); }
+                displayKode(data);
+            } catch (error) {
+                console.error('Error fetching kode:', error);
+                displayError('Gagal mengambil data kode.');
+            }
         }
 
-        // --- Fungsi untuk mengirim kode (tidak berubah) ---
-        formKode.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const judul = document.getElementById('judul-kode').value;
-            const kode = document.getElementById('kode').value;
-            if (!kode.trim() || !judul.trim()) { alert('Judul dan kode tidak boleh kosong!'); return; }
-            try {
-                const response = await fetch('/api/kode', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ judul, kode }) });
-                if (!response.ok) { const errorData = await response.json(); throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`); }
-                document.getElementById('kode').value = '';
-                document.getElementById('judul-kode').value = '';
-                alert('Kode berhasil dibagikan!');
-                await tampilkanDaftarKode();
-            } catch (error) { console.error('Gagal memposting kode:', error); alert(`Terjadi kesalahan: ${error.message}`); }
-        });
+        // Fungsi untuk menampilkan kode di halaman admin
+        function displayKode(kodeList) {
+            const kodeListDiv = document.getElementById('kode-list');
+            kodeListDiv.innerHTML = ''; // Kosongkan list
 
-        // --- Fungsi untuk menghapus kode (tidak berubah) ---
-        async function hapusKode(id) {
-            try {
-                const response = await fetch(`/api/kode/${id}`, { method: 'DELETE' });
-                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                alert('Kode berhasil dihapus!');
-                await tampilkanDaftarKode();
-            } catch (error) { console.error('Gagal menghapus kode:', error); alert('Terjadi kesalahan saat menghapus kode.'); }
+            if (kodeList.length === 0) {
+                kodeListDiv.innerHTML = '<p>Belum ada kode yang dibagikan.</p>';
+                return;
+            }
+
+            kodeList.forEach(kodeItem => {
+                const kodeDiv = document.createElement('div');
+                kodeDiv.classList.add('kode-item');
+                kodeDiv.innerHTML = `
+                    <h2>${escapeHtml(kodeItem.judul)}</h2>
+                    <pre><code>${escapeHtml(kodeItem.kode)}</code></pre>
+                    <div class="meta">
+                        <span>ID: ${kodeItem.id}</span> |
+                        <span>Timestamp: ${new Date(kodeItem.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="actions">
+                        <button onclick="deleteKode(${kodeItem.id})">Hapus</button>
+                    </div>
+                `;
+                kodeListDiv.appendChild(kodeDiv);
+            });
         }
 
-        // --- Fungsi untuk menampilkan daftar file (dengan info download) ---
-           async function tampilkanDaftarFile() {
-            try {
-                const response = await fetch('/api/files');
-                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                const data = await response.json();
-                data.sort((a, b) => b.timestamp - a.timestamp);
-                daftarFile.innerHTML = '';
+        // Fungsi untuk menambahkan kode baru
+        async function addKode() {
+            const judulInput = document.getElementById('judul-input');
+            const kodeInput = document.getElementById('kode-input');
+            const judul = judulInput.value;
+            const kode = kodeInput.value;
 
-               data.forEach(item => {
-                  const listItemContainer = document.createElement('div');
-                  listItemContainer.classList.add('list-item-container');
-
-                    const fileItem = document.createElement('div');
-                    fileItem.classList.add('file-item');
-
-                     // Kontainer untuk detail item
-                  const itemDetails = document.createElement('div');
-                  itemDetails.classList.add('item-details');
-
-                    // Bagian informasi
-                    const fileInfo = document.createElement('div');
-                    fileInfo.classList.add('file-info');
-
-
-                    const judulFile = document.createElement('h3'); // Judul
-                    judulFile.textContent = item.judul;
-                    fileInfo.appendChild(judulFile);
-
-                    const namaFile = document.createElement('span');
-                    namaFile.textContent = item.originalname;
-                    fileInfo.appendChild(namaFile);
-
-                    const infoDownload = document.createElement('span');
-                    infoDownload.classList.add('info-admin');
-                    infoDownload.innerHTML = `<i class="fas fa-download"></i> ${item.downloadCount} unduhan`; // Font Awesome
-                    fileInfo.appendChild(infoDownload);
-
-                    itemDetails.appendChild(fileInfo); // Tambah info ke item
-                    listItemContainer.appendChild(itemDetails);
-
-
-                    const tombolHapusFile = document.createElement('button');
-                    tombolHapusFile.textContent = 'Hapus';
-                    tombolHapusFile.classList.add('tombol-hapus');
-                    tombolHapusFile.addEventListener('click', async () => { if (confirm('Apakah anda Yakin ingin menghapus file ini?')) { await hapusFile(item.id) } });
-                    listItemContainer.appendChild(tombolHapusFile);
-                    daftarFile.appendChild(listItemContainer)
-                });
-            } catch (error) { console.error('Gagal mengambil daftar file:', error); alert('Terjadi kesalahan saat mengambil daftar file.');}
-        }
-
-        // --- Fungsi untuk menghapus file (tidak berubah) ---
-        async function hapusFile(id) {
-            try {
-                const response = await fetch(`/api/files/${id}`, { method: 'DELETE', });
-                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                alert('file berhasil di hapus');
-                await tampilkanDaftarFile();
-            } catch (error) { console.error('Gagal menghapus File:', error); alert('Terjadi kesalahan saat menghapus File.'); }
-        }
-
-        // --- Fungsi untuk mengupload file (tidak berubah) ---
-        formFile.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const fileInput = document.getElementById('file');
-            const file = fileInput.files[0];
-            const judulFile = document.getElementById('judul-file').value;
-
-            if (!file) { alert('Pilih file terlebih dahulu!'); return; }
-             if (!judulFile) { alert('Masukan Judul File terlebih dahulu!'); return; }
-
-            const readFileAsBase64 = (file) => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            };
+            if (!judul || !kode) {
+                alert('Judul dan kode harus diisi!');
+                return;
+            }
 
             try {
-                const base64String = await readFileAsBase64(file);
-                const response = await fetch('/api/files', {
+                const response = await fetch('/api/kode', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ originalname: file.name, file: base64String, judul: judulFile }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ judul, kode }),
                 });
 
-                if (!response.ok) { const errorData = await response.json(); throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`); }
-                alert('File berhasil diupload!');
-                fileInput.value = '';
-                document.getElementById('judul-file').value = '';
-                await tampilkanDaftarFile();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const newKode = await response.json();
+                // Tambahkan kode ke tampilan (tanpa perlu fetch ulang)
+                displayKode([newKode, ...getKodeFromDom()]); //Prepend, kode baru di atas.
+                judulInput.value = ''; // Kosongkan input
+                kodeInput.value = '';
+            } catch (error) {
+                console.error('Error adding kode:', error);
+                displayError('Gagal menambahkan kode.');
+            }
+        }
 
-            } catch (error) { console.error('Gagal mengupload file:', error); alert(`Terjadi kesalahan: ${error.message}`); }
-        });
+
+       // Helper untuk mendapatkan kode dari DOM
+        function getKodeFromDom(){
+            const kodeListDiv = document.getElementById('kode-list');
+            const kodeItems = [];
+            kodeListDiv.querySelectorAll('.kode-item').forEach(item => {
+                const judul = item.querySelector('h2').textContent;
+                const kode = item.querySelector('pre code').textContent;
+                const id = parseInt(item.querySelector('.meta span:first-child').textContent.replace("ID: ", "")); // Ambil ID
+
+                kodeItems.push({id, judul, kode});
+            });
+            return kodeItems;
+        }
+
+        // Fungsi untuk menghapus kode
+        async function deleteKode(id) {
+          if (!confirm('Apakah Anda yakin ingin menghapus kode ini?')) {
+            return;
+          }
+
+          try {
+            const response = await fetch(`/api/kode/${id}`, {
+              method: 'DELETE',
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+             // Hapus kode dari tampilan
+            const kodeItem = document.querySelector(`.kode-item:has(button[onclick="deleteKode(${id})"])`); //Cari item berdasarkan tombol hapus.
+                if(kodeItem){
+                   kodeItem.remove();
+                }
 
 
-        // --- Panggil fungsi saat halaman dimuat ---
+          } catch (error) {
+            console.error('Error deleting kode:', error);
+            displayError('Gagal menghapus kode.');
+          }
+        }
+
+        // Fungsi untuk menampilkan pesan error
+        function displayError(message) {
+            const kodeListDiv = document.getElementById('kode-list');
+            kodeListDiv.innerHTML = `<p style="color: red;">${message}</p>`;
+        }
+        // Helper function untuk escape HTML entities
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&")
+                .replace(/</g, "<")
+                .replace(/>/g, ">")
+                .replace(/"/g, """)
+                .replace(/'/g, "'");
+        }
+
+
+
+        // --- Dark Mode ---
+        function toggleDarkMode() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            document.getElementById('dark-mode-icon').textContent = isDarkMode ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            updateDashboard(); // Update dashboard
-            tampilkanDaftarKode();
-            tampilkanDaftarFile();
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-icon').textContent = '☀️';
+            }
+            getKode();
         });
+
     </script>
 </body>
 </html>
