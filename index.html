@@ -1,325 +1,367 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Share</title>
+    <title>Share Kode & File</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- <link rel="stylesheet" href="style.css"> --> <!-- Jika Anda memisahkan CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
     <style>
-        /* CSS Reset (Minimal) */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: sans-serif; line-height: 1.6; background-color: #f4f4f4; color: #333; }
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
-        header { background: #333; color: #fff; padding: 1rem 0; text-align: center; }
-        header h1 { margin: 0; }
-        #kode-list, #file-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-        .kode-item, .file-item { border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #fff; }
-        .kode-item h2, .file-item h2 { margin-bottom: 10px; font-size: 1.2em; }
-        .kode-item pre { background-color: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; white-space: pre-wrap; }
-        .kode-item .meta, .file-item .meta  { font-size: 0.8em; color: #666; margin-top: 10px; }
-        .comments-section { margin-top: 15px; }
-        .comments-section h3 { font-size: 1em; margin-bottom: 5px; }
-        .comment { border-bottom: 1px solid #eee; padding: 8px 0; }
-        .comment .author { font-weight: bold; }
-        .comment .text { margin-top: 5px;}
-        .add-comment { margin-top: 10px;}
-        .add-comment input, .add-comment textarea { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;}
-        .add-comment button { background-color: #333; color: #fff; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-        .add-comment button:hover{background-color: #111;}
-
-        /* Dark Mode Styles (Optional) */
-        body.dark-mode { background-color: #121212; color: #eee; }
-        body.dark-mode .kode-item, body.dark-mode .file-item { background-color: #222; border-color: #444; }
-        body.dark-mode .kode-item pre { background-color: #333; }
-        body.dark-mode .comment { border-bottom-color: #444; }
-        .dark-mode-toggle {
-          position: fixed;
-          top: 10px;
-          right: 10px;
-          background-color: #000; /* Hitam Pekat */
-          color: #fff;
-          border: none;
-          padding: 5px 10px;
-          border-radius: 50%; /* Bentuk lingkaran */
-          cursor: pointer;
-          font-size: 1.5em; /* Ukuran emoji */
-          line-height: 1; /* Pusatkan emoji */
-        }
-        body.dark-mode .dark-mode-toggle {
-            background-color: #fff;
-            color: #000;
-        }
-
-        /* Style untuk File List */
-        .file-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .file-item a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .file-item a:hover {
-            text-decoration: underline;
-        }
-
-        .file-item .meta {
-            margin-top: auto; /* Dorong meta ke bawah */
-        }
-
-
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Roboto Mono', monospace; background-color: #000; color: #fff; line-height: 1.6; overflow-x: hidden;  padding-bottom: 50px;}
+      h1, h2 { font-family: 'Poppins', sans-serif; text-align: center; margin-bottom: 1rem; color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+      h1 { font-size: 2.5rem; margin-top: 2rem; margin-bottom: 2rem;}
+      #container-utama, #container-file { display: flex; flex-direction: column; gap: 2rem; padding: 20px; max-width: 900px; margin: 0 auto; }
+      .kontainer-kode { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); }
+      .kontainer-kode:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-kode pre { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; max-height: 150px; overflow: hidden; transition: max-height 0.5s ease; }
+      .kontainer-kode.expanded pre { max-height: 1000px; }
+      .kontainer-kode .tombol-copy { position: absolute; top: 10px; right: 10px; background-color: #00ffff; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s, transform 0.3s; }
+      .kontainer-kode .tombol-copy:hover { background-color: #00d1d1; transform: scale(1.05); }
+      .kontainer-kode .judul-kode { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      .kontainer-file { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-bottom: 1rem;}
+      .kontainer-file:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-file .file-link { color: #00ffff; text-decoration: none; font-weight: bold; display: inline-block; transition: color 0.3s, transform 0.3s; }
+      .kontainer-file .file-link::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 8px; }
+      .kontainer-file .file-link:hover { color: #00d1d1; transform: translateX(5px); }
+      .kontainer-file .judul-file { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+      .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
+      .modal-konten { background-color: #111; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; border-radius: 8px; position: relative; }
+      .modal-konten pre{ white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; }
+      .tutup-modal { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+      .tutup-modal:hover, .tutup-modal:focus { color: #fff; text-decoration: none; }
+      .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s, color 0.3s; display: block; margin: 10px auto 0; font-size: 0.8rem;}
+      .tombol-load-more:hover { background-color: #00ffff; color: #000; }
+      .judul-kode-modal, .judul-file-modal { font-size: 1.5rem; color: #00ffff; margin-bottom: 1rem; border-bottom: 2px solid rgba(0, 255, 255, 0.5); padding-bottom: 0.5rem;}
+      .info-count { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; display: flex; align-items: center; gap: 10px; }
+      .copy-count, .download-count, .like-count, .comment-count { margin-left: 5px; display: flex; align-items: center; }
+      .copy-count::before { content: '\f0c5'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .download-count::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .like-count::before { content: '\f164'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; cursor: pointer; }
+      .comment-count::before { content: '\f075'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .komentar-container { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0, 255, 255, 0.3); }
+      .komentar-item { margin-bottom: 0.8rem; padding: 0.5rem; border-radius: 4px; background-color: rgba(255, 255, 255, 0.05); }
+      .komentar-author { font-weight: bold; color: #00ffff; }
+      .komentar-text { color: #ddd; }
+      .komentar-form { margin-top: 1rem; }
+      .komentar-form input[type="text"], .komentar-form textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid rgba(0, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; font-family: 'Roboto Mono', monospace; }
+      .komentar-form button { background-color: #00ffff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+      .komentar-form button:hover { background-color: #00d1d1; }
+      .file-preview { margin-top: 1rem; text-align: center; }
+      .file-preview img { max-width: 100%; max-height: 200px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
+      .file-preview a { color: #00ffff; text-decoration: none; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Code Share</h1>
-            <p>Bagikan dan temukan potongan kode dan file.</p>
-        </div>
-    </header>
+    <div id="particles-js"></div>
+    <h1>Kumpulan Kode</h1>
+    <div id="container-utama"></div>
 
-    <main class="container">
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">
-            <span id="dark-mode-icon">🌙</span>
-        </button>
+    <h1>Kumpulan File</h1>
+    <div id="container-file"></div>
 
-        <h2>Kode Terbaru</h2>
-        <div id="kode-list">
-            <!-- Kode akan ditampilkan di sini -->
+    <div id="modal-kode" class="modal">
+        <div class="modal-konten">
+            <span class="tutup-modal">×</span>
+             <h2 class="judul-kode-modal"></h2>
+            <pre></pre>
         </div>
+    </div>
 
-        <h2>File Terbaru</h2>
-        <div id="file-list">
-            <!-- File akan ditampilkan di sini -->
-        </div>
-    </main>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <script>
+      particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, }, "opacity": { "value": 0.7, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } }, "retina_detect": true });
 
-    // --- Bagian Kode (Tidak banyak berubah) ---
-    async function getKode() {
-        try {
-            const response = await fetch('/api/kode');
-            if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-            const data = await response.json();
-            displayKode(data);
-        } catch (error) {
-            console.error('Error fetching kode:', error);
-            displayError('Gagal mengambil data kode.');
-        }
-    }
+        const modal = document.getElementById('modal-kode');
+        const tutupModal = document.querySelector('.tutup-modal');
+        const modalPre = document.querySelector('#modal-kode pre');
+        const judulModal = document.querySelector('#modal-kode .judul-kode-modal')
 
-        // ... (fungsi displayKode, getComments, displayComments, addComment, getCommentsFromDom, displayError, escapeHtml - tidak berubah)
-    // Fungsi untuk menampilkan kode di halaman
-    function displayKode(kodeList) {
-        const kodeListDiv = document.getElementById('kode-list');
-        kodeListDiv.innerHTML = ''; // Kosongkan list
+        tutupModal.addEventListener('click', () => { modal.style.display = 'none'; });
+        window.addEventListener('click', (event) => { if (event.target === modal) { modal.style.display = 'none'; } });
 
-        if (kodeList.length === 0) {
-            kodeListDiv.innerHTML = '<p>Belum ada kode yang dibagikan.</p>';
-            return;
-        }
+        function buatKontainerKode(item) {
+          const containerUtama = document.getElementById('container-utama');
+          const kontainerKode = document.createElement('div');
+          kontainerKode.classList.add('kontainer-kode');
 
-        kodeList.forEach(kodeItem => {
-            const kodeDiv = document.createElement('div');
-            kodeDiv.classList.add('kode-item');
-            kodeDiv.innerHTML = `
-                <h2>${escapeHtml(kodeItem.judul)}</h2>
-                <pre><code>${escapeHtml(kodeItem.kode)}</code></pre>
-                <div class="meta">
-                    <span>ID: ${kodeItem.id}</span> |
-                    <span>Timestamp: ${new Date(kodeItem.timestamp).toLocaleString()}</span> |
-                    <span>Likes: ${kodeItem.likes}</span> |
-                    <span>Copies: ${kodeItem.copyCount}</span>
-                </div>
-                <div class="comments-section">
-                    <h3>Komentar:</h3>
-                    <div class="comments-list"></div>
-                    <div class="add-comment">
-                        <input type="text" class="comment-author" placeholder="Nama Anda">
-                        <textarea class="comment-text" placeholder="Tambahkan komentar..."></textarea>
-                        <button onclick="addComment(${kodeItem.id})">Kirim Komentar</button>
-                    </div>
-                </div>
-            `;
+          const judul = document.createElement('h2');
+          judul.textContent = item.judul;
+          judul.classList.add('judul-kode');
+          kontainerKode.appendChild(judul);
 
-            kodeListDiv.appendChild(kodeDiv);
-            getComments(kodeItem.id); // Ambil komentar untuk setiap kode
-        });
-    }
+          const pre = document.createElement('pre');
+          const code = document.createElement('code');
+          code.textContent = item.kode;
+          pre.appendChild(code);
+          kontainerKode.appendChild(pre);
+          hljs.highlightElement(code);
 
-    // Fungsi untuk mengambil komentar dari API
-    async function getComments(kodeId) {
-      try {
-        const response = await fetch(`/api/kode/${kodeId}/comments`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const comments = await response.json();
-        displayComments(kodeId, comments);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-    }
-
-    // Fungsi untuk menampilkan komentar
-    function displayComments(kodeId, comments) {
-      const commentsListDiv = document.querySelector(`.kode-item:has(button[onclick="addComment(${kodeId})"]) .comments-list`); //Cari comment list yang sesuai dengan kode id
-
-        if (!commentsListDiv) {
-            console.error("commentsListDiv not found for kodeId:", kodeId);
-            return;
-        }
-
-      commentsListDiv.innerHTML = ''; // Kosongkan list komentar
-
-      if (comments.length === 0) {
-        commentsListDiv.innerHTML = '<p>Belum ada komentar.</p>';
-        return;
-      }
-
-      comments.forEach(comment => {
-        const commentDiv = document.createElement('div');
-        commentDiv.classList.add('comment');
-        commentDiv.innerHTML = `
-          <span class="author">${escapeHtml(comment.author)}:</span>
-          <span class="text">${escapeHtml(comment.text)}</span>
-          <span class="timestamp">${new Date(comment.timestamp).toLocaleString()}</span>
-        `;
-        commentsListDiv.appendChild(commentDiv);
-      });
-    }
-
-
-    //Fungsi untuk menambahkan komentar
-    async function addComment(kodeId) {
-        const authorInput = document.querySelector(`.kode-item:has(button[onclick="addComment(${kodeId})"]) .comment-author`);
-        const textInput = document.querySelector(`.kode-item:has(button[onclick="addComment(${kodeId})"]) .comment-text`);
-
-        const author = authorInput.value;
-        const text = textInput.value;
-
-        if (!author || !text) {
-            alert('Nama dan komentar harus diisi!');
-            return;
-        }
-
-          try {
-            const response = await fetch(`/api/kode/${kodeId}/comments`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ author, text }),
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const newComment = await response.json();
-            // Tambahkan komentar ke tampilan (tanpa perlu fetch ulang)
-            displayComments(kodeId, [ ...getCommentsFromDom(kodeId), newComment]);
-            authorInput.value = ''; // Kosongkan input
-            textInput.value = '';
-          } catch (error) {
-            console.error('Error adding comment:', error);
-            displayError('Gagal menambahkan komentar.');
+          if (item.kode.length > 200) {
+              const tombolLoadMore = document.createElement('button');
+              tombolLoadMore.textContent = 'Load More';
+              tombolLoadMore.classList.add('tombol-load-more');
+              tombolLoadMore.addEventListener('click', () => {
+                modalPre.textContent = item.kode;
+                judulModal.textContent = item.judul;
+                modal.style.display = 'block';
+              });
+              kontainerKode.appendChild(tombolLoadMore);
           }
-      }
 
-    // Helper function untuk mengambil comments dari DOM
-    function getCommentsFromDom(kodeId) {
-      const commentsListDiv = document.querySelector(`.kode-item:has(button[onclick="addComment(${kodeId})"]) .comments-list`);
-      const comments = [];
-        if(commentsListDiv){
-            commentsListDiv.querySelectorAll('.comment').forEach(commentDiv => {
-                const author = commentDiv.querySelector('.author').textContent.replace(":", "").trim();
-                const text = commentDiv.querySelector('.text').textContent;
-                comments.push({author, text});
-            });
-        }
-        return comments;
-    }
+          const tombolCopy = document.createElement('button');
+          tombolCopy.textContent = 'Copy';
+          tombolCopy.classList.add('tombol-copy');
+          tombolCopy.addEventListener('click', async () => {
+              try {
+                  await navigator.clipboard.writeText(item.kode);
+                  gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                  alert('Kode berhasil disalin!');
 
+                  const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
+                  if (response.ok) {
+                      const data = await response.json();
+                      const copyCountEl = kontainerKode.querySelector('.copy-count');
+                      if (copyCountEl) { copyCountEl.textContent = data.count; }
+                  }
+              } catch (err) { console.error('Gagal menyalin atau update count:', err); }
+          });
+          kontainerKode.appendChild(tombolCopy);
 
-    // Fungsi untuk menampilkan pesan error
-    function displayError(message) {
-        const kodeListDiv = document.getElementById('kode-list');
-        kodeListDiv.innerHTML = `<p style="color: red;">${message}</p>`;
-    }
+          const infoCount = document.createElement('div');
+          infoCount.classList.add('info-count');
 
-     // Helper function untuk escape HTML entities
-    function escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&")
-            .replace(/</g, "<")
-            .replace(/>/g, ">")
-            .replace(/"/g, """)
-            .replace(/'/g, "'");
-    }
+          const copyCount = document.createElement('span');
+          copyCount.classList.add('copy-count');
+          copyCount.textContent = item.copyCount;
+          infoCount.appendChild(copyCount);
 
-    // --- Bagian File (Baru) ---
+          const likeCount = document.createElement('span');
+          likeCount.classList.add('like-count');
+          likeCount.textContent = item.likes;
+          likeCount.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`/api/kode/${item.id}/like`, { method: 'POST' });
+                    if (response.ok) {
+                      const data = await response.json();
+                        likeCount.textContent = data.likes;
+                    }
+                } catch (error) {
+                    console.error('Gagal like:', error);
+                }
+          });
+          infoCount.appendChild(likeCount);
 
-    async function getFiles() {
-        try {
-            const response = await fetch('/api/files');
-            if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-            const data = await response.json();
-            displayFiles(data);
-        } catch (error) {
-            console.error('Error fetching files:', error);
-            displayError('Gagal mengambil daftar file.');
-        }
-    }
+          const commentCount = document.createElement('span');
+          commentCount.classList.add('comment-count');
+          commentCount.textContent = item.comments.length;
+          infoCount.appendChild(commentCount);
 
-    function displayFiles(fileList) {
-        const fileListDiv = document.getElementById('file-list');
-        fileListDiv.innerHTML = '';
+          kontainerKode.appendChild(infoCount);
 
-        if (fileList.length === 0) {
-            fileListDiv.innerHTML = '<p>Belum ada file yang dibagikan.</p>';
-            return;
-        }
+          const komentarContainer = document.createElement('div');
+          komentarContainer.classList.add('komentar-container');
 
-        fileList.forEach(fileItem => {
-            const fileDiv = document.createElement('div');
-            fileDiv.classList.add('file-item');
-            fileDiv.innerHTML = `
-                <h2><a href="${escapeHtml(fileItem.url)}" target="_blank">${escapeHtml(fileItem.name)}</a></h2>
-                <div class="meta">
-                    <span>ID: ${fileItem.id}</span> |
-                    <span>Timestamp: ${new Date(fileItem.timestamp).toLocaleString()}</span> |
-                    <span>Downloads: ${fileItem.downloadCount}</span>
-                </div>
+          const komentarList = document.createElement('div');
+          komentarList.classList.add('komentar-list');
+          komentarContainer.appendChild(komentarList);
+
+          const komentarForm = document.createElement('form');
+          komentarForm.classList.add('komentar-form');
+          komentarForm.innerHTML = `
+              <input type="text" name="author" placeholder="Nama Anda" required>
+              <textarea name="text" placeholder="Komentar Anda" required></textarea>
+              <button type="submit">Kirim Komentar</button>
+          `;
+          komentarForm.addEventListener('submit', async (event) => {
+              event.preventDefault();
+              const author = komentarForm.elements.author.value;
+              const text = komentarForm.elements.text.value;
+
+                if (!author || !text) {
+                  alert('Nama dan Komentar harus Di isi');
+                  return;
+                }
+
+              try {
+                  const response = await fetch(`/api/kode/${item.id}/comments`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ author, text }),
+                  });
+                  if (response.ok) {
+                      const newComment = await response.json();
+                      tampilkanKomentar(newComment, komentarList);
+                      komentarForm.reset();
+                      commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                  } else {
+                      throw new Error('Gagal mengirim komentar.');
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+                  alert('Terjadi kesalahan saat mengirim komentar.');
+              }
+          });
+          komentarContainer.appendChild(komentarForm);
+          kontainerKode.appendChild(komentarContainer);
+
+          function tampilkanKomentar(comment, container) {
+            const komentarItem = document.createElement('div');
+            komentarItem.classList.add('komentar-item');
+            komentarItem.innerHTML = `
+                <p class="komentar-author">${comment.author}</p>
+                <p class="komentar-text">${comment.text}</p>
             `;
-            fileListDiv.appendChild(fileDiv);
-        });
-    }
+            container.appendChild(komentarItem);
+          }
 
+          async function ambilKomentar(kodeId, container) {
+            try {
+                const response = await fetch(`/api/kode/${kodeId}/comments`);
+                if (response.ok) {
+                    const comments = await response.json();
+                    comments.forEach(comment => tampilkanKomentar(comment, container));
+                } else {
+                    throw new Error('Gagal mengambil komentar.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+          }
 
-    // --- Dark Mode ---
-    function toggleDarkMode() {
-        const body = document.body;
-        body.classList.toggle('dark-mode');
-        const isDarkMode = body.classList.contains('dark-mode');
-        document.getElementById('dark-mode-icon').textContent = isDarkMode ? '☀️' : '🌙';
-        localStorage.setItem('darkMode', isDarkMode);
-    }
+          ambilKomentar(item.id, komentarList);
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (isDarkMode) {
-            document.body.classList.add('dark-mode');
-            document.getElementById('dark-mode-icon').textContent = '☀️';
+          containerUtama.appendChild(kontainerKode);
+          gsap.from(kontainerKode, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out" });
         }
-        getKode();
-        getFiles(); // Ambil daftar file
-    });
 
+        async function ambilDataKode() {
+            try {
+                const response = await fetch('/api/kode');
+                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                const data = await response.json();
+                data.sort((a, b) => b.timestamp - a.timestamp);
+                data.forEach(item => { buatKontainerKode(item); });
+            } catch (error) { console.error('Gagal mengambil data:', error); }
+        }
+
+        function buatKontainerFile(item) {
+          const containerFile = document.getElementById('container-file');
+          const kontainerFile = document.createElement('div');
+          kontainerFile.classList.add('kontainer-file');
+
+          const judulFile = document.createElement('h2');
+          judulFile.textContent = item.judul;
+          judulFile.classList.add('judul-file');
+          kontainerFile.appendChild(judulFile);
+
+          const fileLink = document.createElement('a');
+          fileLink.textContent = item.originalname;
+          fileLink.href = '#';
+          fileLink.classList.add('file-link');
+          fileLink.addEventListener('click', async (event) => {
+              event.preventDefault();
+              try {
+                  const response = await fetch(`/api/files/${item.id}`);
+                  if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                  const fileData = await response.json();
+
+                  const filePreview = document.createElement('div');
+                  filePreview.classList.add('file-preview');
+
+                  if (item.type === 'jpg' || item.type === 'jpeg' || item.type === 'png' || item.type === 'gif') {
+                    const img = document.createElement('img');
+                    img.src = fileData.file;
+                    img.alt = item.originalname;
+                    filePreview.appendChild(img);
+
+                } else if (item.type === 'txt' || item.type === 'md' || item.type === 'js' || item.type === 'css' || item.type === 'html') {
+                      const pre = document.createElement('pre');
+                      const code = document.createElement('code');
+                      const textContent = atob(fileData.file.split(',')[1]);
+                      code.textContent = textContent;
+                      pre.appendChild(code);
+                      filePreview.appendChild(pre);
+                      hljs.highlightElement(code);
+                  } else if (item.type === "pdf") {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = fileData.file;
+                    iframe.width = "100%";
+                    iframe.height = "500px";
+                    filePreview.appendChild(iframe);
+
+                  } else {
+                      filePreview.innerHTML = `<a href="${fileData.file}" download="${item.originalname}">Download ${item.originalname}</a>`;
+                  }
+                    kontainerFile.appendChild(filePreview);
+
+                  const link = document.createElement('a');
+                  link.href = fileData.file;
+                  link.download = fileData.originalname;
+                  link.click();
+
+                  const downloadResponse = await fetch(`/api/files/${item.id}/download`, { method: 'POST' });
+                  if (downloadResponse.ok) {
+                    const downloadData = await downloadResponse.json();
+                    const downloadCountEl = kontainerFile.querySelector('.download-count');
+                    if(downloadCountEl){
+                        downloadCountEl.textContent = downloadData.count;
+                    }
+                  }
+              }catch(error){ console.error('Gagal mendownload file atau update count:', error); alert('Terjadi kesalahan.');}
+            });
+          kontainerFile.appendChild(fileLink);
+
+          const infoCount = document.createElement('div');
+          infoCount.classList.add('info-count');
+
+          const downloadCount = document.createElement('span');
+          downloadCount.classList.add('download-count');
+          downloadCount.textContent = item.downloadCount;
+          infoCount.appendChild(downloadCount);
+
+          const likeCount = document.createElement('span');
+          likeCount.classList.add('like-count');
+          likeCount.textContent = item.likes;
+          likeCount.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/files/${item.id}/like`, {method: 'POST'});
+                if(response.ok){
+                    const data = await response.json();
+                    likeCount.textContent = data.likes;
+                }
+            } catch (error) {
+                console.error("Gagal Like:", error)
+            }
+          });
+          infoCount.appendChild(likeCount);
+          kontainerFile.appendChild(infoCount);
+          containerFile.appendChild(kontainerFile);
+          gsap.from(kontainerFile, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out", delay: 0.2 });
+        }
+
+        async function ambilDataFile() {
+            try {
+                const response = await fetch('/api/files');
+                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                const data = await response.json();
+                data.sort((a, b) => b.timestamp - a.timestamp);
+                data.forEach(item => { buatKontainerFile(item); });
+            } catch (error) { console.error('Gagal mengambil data:', error); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ambilDataKode();
+            ambilDataFile();
+        });
     </script>
 </body>
 </html>
