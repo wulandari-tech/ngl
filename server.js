@@ -9,7 +9,7 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
 });
-app.get('/lam', (req, res) => {
+app.get('/lan', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
 });
 // --- Endpoint Kode ---
@@ -46,7 +46,7 @@ app.delete('/api/kode/:id', async (req, res) => {
         res.status(500).json({ message: 'Gagal menghapus kode.' });
     }
 });
-app.post('/api/kode/:id/copy', async (req, res) => { ... }); // Tidak berubah
+//app.post('/api/kode/:id/copy', async (req, res) => { ... }); // Tidak berubah
 //app.post('/api/kode/:id/like', async (req, res) => { ... });  // Tidak berubah
 
 // Endpoint untuk Komentar
