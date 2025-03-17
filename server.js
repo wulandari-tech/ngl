@@ -1,23 +1,27 @@
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
+// ... (jika ada kode multer atau lainnya) ...
+
 const app = express();
 const port = 3000;
 
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));  // Sesuaikan jika perlu
 app.use(express.static(__dirname));
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
-});
-app.get('/lan', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
-});
+
+// ... (endpoint /, /admin, dll.) ...
+
 // --- Endpoint Kode ---
+
+// ... (GET /api/kode, POST /api/kode) ...
 app.get('/api/kode', async (req, res) => {
     try {
         const data = await bacaData();
         res.json(data.kode);
-    } catch (error) { res.status(500).json({ message: 'Gagal membaca data kode.' }); }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Gagal membaca data kode.', error: error.message || error });
+    }
 });
 
 app.post('/api/kode', async (req, res) => {
@@ -26,16 +30,17 @@ app.post('/api/kode', async (req, res) => {
     try {
         const data = await bacaData();
         const id = Date.now();
-        const newData = { id, judul, kode, timestamp: id, copyCount: 0, likes: 0, comments: [] }; // comments di sini
+        const newData = { id, judul, kode, timestamp: id, copyCount: 0, likes: 0, comments: [],likedBy:[],copiedBy:[] }; // comments di sini
         data.kode.push(newData);
         await simpanData(data);
         res.status(201).json(newData);
-    } catch (error) { res.status(500).json({ message: 'Gagal menyimpan kode.' }); }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Gagal menyimpan kode.',error:error.message || error }); }
 });
-
-// IMPLEMENTASI Endpoint yang Belum Lengkap (kode)
+// DELETE /api/kode/:id
 app.delete('/api/kode/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10); // Tambahkan radix 10
+    const id = parseInt(req.params.id, 10);
     try {
         const data = await bacaData();
         const index = data.kode.findIndex(item => item.id === id);
@@ -46,112 +51,137 @@ app.delete('/api/kode/:id', async (req, res) => {
         await simpanData(data);
         res.json({ message: 'Kode berhasil dihapus.' });
     } catch (error) {
-        console.error(error); // Log error
-        res.status(500).json({ message: 'Gagal menghapus kode.', error: error.message || error }); // Kirim pesan error yang lebih detail
+        console.error(error);
+        res.status(500).json({ message: 'Gagal menghapus kode.', error: error.message || error });
     }
 });
 
+// POST /api/kode/:id/copy - Copy (tanpa spam)
 app.post('/api/kode/:id/copy', async (req, res) => {
-     const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id, 10);
+    const ip = req.ip; // Ambil IP address dari request
+
     try {
         const data = await bacaData();
         const kodeItem = data.kode.find(item => item.id === id);
         if (!kodeItem) {
             return res.status(404).json({ message: 'Kode tidak ditemukan.' });
         }
+
+        // Cek apakah IP ini sudah pernah copy
+        if (kodeItem.copiedBy.includes(ip)) {
+            return res.status(400).json({ message: 'Anda sudah pernah menyalin kode ini.' });
+        }
+
         kodeItem.copyCount++;
+        kodeItem.copiedBy.push(ip); // Tambahkan IP ke array copiedBy
         await simpanData(data);
-        res.json({ message: 'Copy count berhasil ditingkatkan.', copyCount: kodeItem.copyCount});
+        res.json({ message: 'Copy count berhasil ditingkatkan.', copyCount: kodeItem.copyCount });
     } catch (error) {
-       console.error(error);
+        console.error(error);
         res.status(500).json({ message: 'Gagal meningkatkan copy count.', error: error.message || error });
     }
 });
 
+// POST /api/kode/:id/like - Like (tanpa spam)
 app.post('/api/kode/:id/like', async (req, res) => {
     const id = parseInt(req.params.id, 10);
+    const ip = req.ip; // Ambil IP address
+
     try {
         const data = await bacaData();
         const kodeItem = data.kode.find(item => item.id === id);
         if (!kodeItem) {
             return res.status(404).json({ message: 'Kode tidak ditemukan.' });
         }
+
+        // Cek apakah IP ini sudah pernah like
+        if (kodeItem.likedBy.includes(ip)) {
+            return res.status(400).json({ message: 'Anda sudah pernah menyukai kode ini.' });
+        }
+
         kodeItem.likes++;
+        kodeItem.likedBy.push(ip); // Tambahkan IP ke array likedBy
         await simpanData(data);
-        res.json({ message: 'Like berhasil ditambahkan.', likes: kodeItem.likes });
+        res.json({ message: 'Like berhasil ditambahkan.', likes: kodeItem.likes, liked: true }); // Tambahkan info liked
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Gagal menambahkan like.', error: error.message || error });
     }
 });
 
-
-// Endpoint untuk Komentar (Tidak diubah)
-app.get('/api/kode/:id/comments', async (req, res) => {
+// GET /api/kode/:id/share - Generate URL share
+app.get('/api/kode/:id/share', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     try {
         const data = await bacaData();
         const kodeItem = data.kode.find(item => item.id === id);
-        if (!kodeItem) { return res.status(404).json({ message: 'Kode tidak ditemukan.' }); }
-        res.json(kodeItem.comments); // Kirim komentar dari data.kode
-    } catch (error) { res.status(500).json({ message: 'Gagal mengambil komentar.' }); }
-});
+        if (!kodeItem) {
+            return res.status(404).json({ message: 'Kode tidak ditemukan.' });
+        }
 
-app.post('/api/kode/:id/comments', async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const { author, text } = req.body;
+        const slug = slugify(kodeItem.judul);
+        const shareUrl = `${req.protocol}://${req.get('host')}/kode/${id}/${slug}`; // Buat URL
+        res.json({ shareUrl });
 
-    if (!author || !text) {
-        return res.status(400).json({ message: 'Nama dan komentar diperlukan.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Gagal membuat URL share.', error: error.message || error });
     }
-
-    try {
-        const data = await bacaData();
-        const kodeItem = data.kode.find(item => item.id === id);
-        if (!kodeItem) { return res.status(404).json({ message: 'Kode tidak ditemukan.' }); }
-
-        const newComment = { id: Date.now(), author, text, timestamp: Date.now() };
-        kodeItem.comments.push(newComment); // Tambah komentar ke data.kode
-        await simpanData(data); // Simpan ke data.json!
-        res.status(201).json(newComment);
-    } catch (error) { res.status(500).json({ message: 'Gagal menambahkan komentar.' }); }
 });
 
-// --- Endpoint File --- (Implementasi Tanpa Upload/Download)
-//Karena tidak ada folder uploads, dan permintaan untuk tidak menghapus kode awal
-//endpoint file hanya akan mengembalikan data dummy atau list kosong.
-app.get('/api/files', async (req, res) => {
-    try {
+// --- Endpoint File (Contoh, sesuaikan jika ada upload) ---
+// ... (implementasi endpoint files, dengan logika yang sama untuk likedBy) ...
+app.post('/api/files/:id/like', async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const ip = req.ip;
+
+    try{
         const data = await bacaData();
-         res.json(data.files || []); // Mengembalikan array kosong jika files tidak ada
+        const theFile = data.files.find(x => x.id === id);
+        if(!theFile) {
+            return res.status(404).send("file tidak ditemukan");
+        }
+
+        if(theFile.likedBy.includes(ip)) {
+             return res.status(400).json({ message: 'Anda sudah pernah menyukai file ini.' });
+        }
+
+        theFile.likes++;
+        theFile.likedBy.push(ip);
+        await simpanData(data);
+        res.json({ message: 'Like berhasil ditambahkan.', likes: theFile.likes, liked: true });
+
     } catch(error) {
         console.error(error);
-        res.status(500).json({ message: 'Gagal membaca data files.', error: error.message || error });
+        res.status(500).json({ message: "Gagal menyukai file", error:error.message || error });
     }
-
 });
 
-app.post('/api/files', async (req, res) => {
-     //Karena tidak ada proses upload, maka endpoint ini hanya mengembalikan pesan.
-     res.status(501).send('Not Implemented');
+// GET /api/files/:id/share
+app.get('/api/files/:id/share', async(req,res)=>{
+    const id = parseInt(req.params.id, 10);
+    try {
+        const data = await bacaData();
+        const theFile = data.files.find(x => x.id === id);
+        if(!theFile) {
+            return res.status(404).send("file tidak ditemukan");
+        }
+        const slug = slugify(theFile.filename);
+        const shareUrl = `${req.protocol}://${req.get('host')}/files/${id}/${slug}`; // Buat URL
+        res.json({shareUrl});
+
+    } catch(error) {
+        console.error(error);
+        res.status(500).json({ message: "Gagal generate link share", error: error.message || error});
+    }
 });
 
-app.get('/api/files/:id', async (req, res) => {
-    //Karena tidak ada detail file yang sebenarnya, berikan response 404
-     res.status(404).json({ message: 'File tidak ditemukan.' });
-});
 
-app.delete('/api/files/:id', async (req, res) => {
-    res.status(501).send('Not Implemented');
-});
-app.post('/api/files/:id/download', async (req, res) => {
-   res.status(501).send('Not Implemented');
-});
-app.post('/api/files/:id/like', async (req, res) => {
-     res.status(501).send('Not Implemented');
-});
+// --- Fungsi Bantu ---
 
-// --- Fungsi Bantu --- (Modifikasi untuk Auto-Create data.json)
+// ... (bacaData, simpanData, slugify) ...
+
 async function bacaData() {
     try {
         const data = await fs.readFile('data.json', 'utf8');
@@ -177,5 +207,12 @@ async function simpanData(data) {
         throw error; // Re-throw untuk penanganan di level atas
     }
 }
-
+function slugify(text) {
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Ganti spasi dengan -
+        .replace(/[^\w\-]+/g, '')       // Hapus karakter non-word dan -
+        .replace(/\-\-+/g, '-')         // Ganti multiple - dengan single -
+        .replace(/^-+/, '')             // Hapus - di awal
+        .replace(/-+$/, '');            // Hapus - di akhir
+}
 app.listen(port, () => { console.log(`Server berjalan di http://localhost:${port}`); });
