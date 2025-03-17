@@ -9,10 +9,9 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
 });
-app.get('/lan', (req, res) => {
+app.get('/lam', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
 });
-
 // --- Endpoint Kode ---
 app.get('/api/kode', async (req, res) => {
     try {
@@ -24,17 +23,29 @@ app.get('/api/kode', async (req, res) => {
 app.post('/api/kode', async (req, res) => {
     const { judul, kode } = req.body;
     if (!judul || !kode) { return res.status(400).json({ message: 'Judul dan kode tidak boleh kosong.' }); }
-    try {
+    try { // Perhatikan try ini
         const data = await bacaData();
         const id = Date.now();
-        const newData = { id, judul, kode, timestamp: id, copyCount: 0, likes: 0, comments: [] }; // comments di sini
+        const newData = { id, judul, kode, timestamp: id, copyCount: 0, likes: 0, comments: [] };
         data.kode.push(newData);
         await simpanData(data);
         res.status(201).json(newData);
-    } catch (error) { res.status(500).json({ message: 'Gagal menyimpan kode.' }); }
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menyimpan kode.' });
+    } // Ini adalah penutup untuk try di atas
 });
 
-app.delete('/api/kode/:id', async (req, res) => { ... }); // Tidak berubah
+app.delete('/api/kode/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const data = await bacaData();
+        data.kode = data.kode.filter(item => item.id !== id);
+        await simpanData(data);
+        res.status(200).json({ message: 'Kode berhasil dihapus.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal menghapus kode.' });
+    }
+});
 app.post('/api/kode/:id/copy', async (req, res) => { ... }); // Tidak berubah
 app.post('/api/kode/:id/like', async (req, res) => { ... });  // Tidak berubah
 
