@@ -41,6 +41,10 @@
       .copy-count::before { content: '\f0c5'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
       .download-count::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
       .like-count::before { content: '\f164'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; cursor: pointer; }
+      /* Gaya untuk tombol like yang sudah di-like */
+        .like-count.liked::before {
+          color: red; /* Warna merah untuk like yang sudah di-klik */
+        }
       .comment-count::before { content: '\f075'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
       .komentar-container { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0, 255, 255, 0.3); }
       .komentar-item { margin-bottom: 0.8rem; padding: 0.5rem; border-radius: 4px; background-color: rgba(255, 255, 255, 0.05); }
@@ -53,6 +57,25 @@
       .file-preview { margin-top: 1rem; text-align: center; }
       .file-preview img { max-width: 100%; max-height: 200px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
       .file-preview a { color: #00ffff; text-decoration: none; }
+      /* Tombol Share */
+        .tombol-share {
+            background-color: transparent;
+            color: #00ffff;
+            border: none;
+            padding: 0;
+            font-size: 1rem; /* Sesuaikan ukuran */
+            cursor: pointer;
+            margin-left: 5px; /* Sesuaikan margin */
+            display: flex; /* Menggunakan flexbox untuk center icon */
+            align-items: center; /* Center vertically */
+        }
+
+        .tombol-share i {
+            margin-right: 0; /* Hapus margin jika tidak diperlukan */
+        }
+        .tombol-share:hover {
+            color: #00d1d1; /* Warna hover */
+        }
     </style>
 </head>
 <body>
@@ -87,159 +110,220 @@
         tutupModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (event) => { if (event.target === modal) { modal.style.display = 'none'; } });
 
-        function buatKontainerKode(item) {
-          const containerUtama = document.getElementById('container-utama');
-          const kontainerKode = document.createElement('div');
-          kontainerKode.classList.add('kontainer-kode');
+       function buatKontainerKode(item) {
+            const containerUtama = document.getElementById('container-utama');
+            const kontainerKode = document.createElement('div');
+            kontainerKode.classList.add('kontainer-kode');
 
-          const judul = document.createElement('h2');
-          judul.textContent = item.judul;
-          judul.classList.add('judul-kode');
-          kontainerKode.appendChild(judul);
+            const judul = document.createElement('h2');
+            judul.textContent = item.judul;
+            judul.classList.add('judul-kode');
+            kontainerKode.appendChild(judul);
 
-          const pre = document.createElement('pre');
-          const code = document.createElement('code');
-          code.textContent = item.kode;
-          pre.appendChild(code);
-          kontainerKode.appendChild(pre);
-          hljs.highlightElement(code);
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.textContent = item.kode;
+            pre.appendChild(code);
+            kontainerKode.appendChild(pre);
+            hljs.highlightElement(code);
 
-          if (item.kode.length > 200) {
-              const tombolLoadMore = document.createElement('button');
-              tombolLoadMore.textContent = 'Load More';
-              tombolLoadMore.classList.add('tombol-load-more');
-              tombolLoadMore.addEventListener('click', () => {
-                modalPre.textContent = item.kode;
-                judulModal.textContent = item.judul;
-                modal.style.display = 'block';
-              });
-              kontainerKode.appendChild(tombolLoadMore);
-          }
 
-          const tombolCopy = document.createElement('button');
-          tombolCopy.textContent = 'Copy';
-          tombolCopy.classList.add('tombol-copy');
-          tombolCopy.addEventListener('click', async () => {
-              try {
-                  await navigator.clipboard.writeText(item.kode);
-                  gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
-                  alert('Kode berhasil disalin!');
+            //Tombol Load More
+            if (item.kode.length > 200) {
+                const tombolLoadMore = document.createElement('button');
+                tombolLoadMore.textContent = 'Load More';
+                tombolLoadMore.classList.add('tombol-load-more');
+                tombolLoadMore.addEventListener('click', () => {
+                  modalPre.textContent = item.kode;
+                  judulModal.textContent = item.judul;
+                  modal.style.display = 'block';
+                });
+                kontainerKode.appendChild(tombolLoadMore);
+            }
 
-                  const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
-                  if (response.ok) {
-                      const data = await response.json();
-                      const copyCountEl = kontainerKode.querySelector('.copy-count');
-                      if (copyCountEl) { copyCountEl.textContent = data.count; }
-                  }
-              } catch (err) { console.error('Gagal menyalin atau update count:', err); }
-          });
-          kontainerKode.appendChild(tombolCopy);
+            const tombolCopy = document.createElement('button');
+            tombolCopy.textContent = 'Copy';
+            tombolCopy.classList.add('tombol-copy');
+            tombolCopy.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(item.kode);
+                    gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                    alert('Kode berhasil disalin!');
 
-          const infoCount = document.createElement('div');
-          infoCount.classList.add('info-count');
+                    const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
+                    if (response.ok) {
+                        const data = await response.json();
+                         // Perbarui tampilan copyCount (jika ada)
+                        const copyCountEl = kontainerKode.querySelector('.copy-count');
+                        if (copyCountEl) {
+                            copyCountEl.textContent = data.copyCount;
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert(errorData.message || 'Gagal menyalin kode.'); // Tampilkan pesan error
+                    }
+                } catch (err) {
+                    console.error('Gagal menyalin:', err);
+                }
 
-          const copyCount = document.createElement('span');
-          copyCount.classList.add('copy-count');
-          copyCount.textContent = item.copyCount;
-          infoCount.appendChild(copyCount);
+            });
+            kontainerKode.appendChild(tombolCopy);
 
-          const likeCount = document.createElement('span');
-          likeCount.classList.add('like-count');
-          likeCount.textContent = item.likes;
-          likeCount.addEventListener('click', async () => {
+            const infoCount = document.createElement('div');
+            infoCount.classList.add('info-count');
+
+            const copyCount = document.createElement('span');
+            copyCount.classList.add('copy-count');
+            copyCount.textContent = item.copyCount; // Use item.copyCount directly
+            infoCount.appendChild(copyCount);
+
+
+            const likeCount = document.createElement('span');
+            likeCount.classList.add('like-count');
+            likeCount.textContent = item.likes; // Gunakan item.likes
+
+            // Cek apakah user sudah like (berdasarkan IP, diasumsikan sudah disimpan di backend)
+            // Anda mungkin perlu mengirim request GET terpisah untuk ini, atau
+            // menyertakan informasi ini dalam data awal.  Untuk contoh ini,
+            // saya asumsikan `likedBy` sudah ada di `item`.
+            if (item.likedBy && item.likedBy.includes(getUserIP())) { // Fungsi getUserIP() perlu Anda definisikan
+                likeCount.classList.add('liked'); // Tambahkan class 'liked'
+            }
+
+            likeCount.addEventListener('click', async () => {
                 try {
                     const response = await fetch(`/api/kode/${item.id}/like`, { method: 'POST' });
                     if (response.ok) {
-                      const data = await response.json();
+                        const data = await response.json();
                         likeCount.textContent = data.likes;
+                         // Perbarui class 'liked' berdasarkan respons dari server
+                        if (data.liked) {
+                            likeCount.classList.add('liked');
+                        } else {
+                            likeCount.classList.remove('liked');
+                        }
+                    }  else {
+                        const errorData = await response.json(); // Ambil pesan error
+                        alert(errorData.message || 'Gagal menyukai kode.'); // Tampilkan pesan error
                     }
                 } catch (error) {
                     console.error('Gagal like:', error);
                 }
-          });
-          infoCount.appendChild(likeCount);
+            });
+            infoCount.appendChild(likeCount);
 
-          const commentCount = document.createElement('span');
-          commentCount.classList.add('comment-count');
-          commentCount.textContent = item.comments.length;
-          infoCount.appendChild(commentCount);
 
-          kontainerKode.appendChild(infoCount);
 
-          const komentarContainer = document.createElement('div');
-          komentarContainer.classList.add('komentar-container');
+            const commentCount = document.createElement('span');
+            commentCount.classList.add('comment-count');
+            commentCount.textContent = item.comments.length;  // Gunakan item.comments.length
+            infoCount.appendChild(commentCount);
 
-          const komentarList = document.createElement('div');
-          komentarList.classList.add('komentar-list');
-          komentarContainer.appendChild(komentarList);
 
-          const komentarForm = document.createElement('form');
-          komentarForm.classList.add('komentar-form');
-          komentarForm.innerHTML = `
-              <input type="text" name="author" placeholder="Nama Anda" required>
-              <textarea name="text" placeholder="Komentar Anda" required></textarea>
-              <button type="submit">Kirim Komentar</button>
-          `;
-          komentarForm.addEventListener('submit', async (event) => {
-              event.preventDefault();
-              const author = komentarForm.elements.author.value;
-              const text = komentarForm.elements.text.value;
+
+            // --- Tombol Share ---
+            const tombolShare = document.createElement('button');
+            tombolShare.classList.add('tombol-share');
+            tombolShare.innerHTML = '<i class="fas fa-share"></i>'; // Ikon share
+            tombolShare.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`/api/kode/${item.id}/share`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        alert('Bagikan link ini: ' + data.shareUrl); // Tampilkan URL share
+                        // Atau, gunakan cara yang lebih baik untuk menampilkan URL (misalnya, modal)
+                    } else {
+                        const errorData = await response.json();
+                        alert(errorData.message || "Gagal Generate Link");
+                    }
+                } catch (error) {
+                    console.error('Gagal mendapatkan URL share:', error);
+                }
+            });
+            infoCount.appendChild(tombolShare); // Tambah tombol share ke infoCount
+
+
+            kontainerKode.appendChild(infoCount);
+
+
+            // --- Komentar ---
+
+            const komentarContainer = document.createElement('div');
+            komentarContainer.classList.add('komentar-container');
+
+            const komentarList = document.createElement('div');
+            komentarList.classList.add('komentar-list');
+            komentarContainer.appendChild(komentarList);
+
+            const komentarForm = document.createElement('form');
+            komentarForm.classList.add('komentar-form');
+            komentarForm.innerHTML = `
+                <input type="text" name="author" placeholder="Nama Anda" required>
+                <textarea name="text" placeholder="Komentar Anda" required></textarea>
+                <button type="submit">Kirim Komentar</button>
+            `;
+
+            komentarForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const author = komentarForm.elements.author.value;
+                const text = komentarForm.elements.text.value;
 
                 if (!author || !text) {
-                  alert('Nama dan Komentar harus Di isi');
+                  alert("Nama dan Komentar Harus Di isi");
                   return;
                 }
 
+                try {
+                    const response = await fetch(`/api/kode/${item.id}/comments`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ author, text }),
+                    });
+                    if (response.ok) {
+                        const newComment = await response.json();
+                        tampilkanKomentar(newComment, komentarList);
+                        komentarForm.reset();
+                         // Update jumlah komentar
+                        commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                    } else {
+                        throw new Error('Gagal mengirim komentar.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengirim komentar.');
+                }
+            });
+            komentarContainer.appendChild(komentarForm);
+            kontainerKode.appendChild(komentarContainer);
+
+            function tampilkanKomentar(comment, container) {
+              const komentarItem = document.createElement('div');
+              komentarItem.classList.add('komentar-item');
+              komentarItem.innerHTML = `
+                  <p class="komentar-author">${comment.author}</p>
+                  <p class="komentar-text">${comment.text}</p>
+              `;
+              container.appendChild(komentarItem);
+            }
+
+            async function ambilKomentar(kodeId, container) {
               try {
-                  const response = await fetch(`/api/kode/${item.id}/comments`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ author, text }),
-                  });
+                  const response = await fetch(`/api/kode/${kodeId}/comments`);
                   if (response.ok) {
-                      const newComment = await response.json();
-                      tampilkanKomentar(newComment, komentarList);
-                      komentarForm.reset();
-                      commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                      const comments = await response.json();
+                      comments.forEach(comment => tampilkanKomentar(comment, container));
                   } else {
-                      throw new Error('Gagal mengirim komentar.');
+                      throw new Error('Gagal mengambil komentar.');
                   }
               } catch (error) {
                   console.error('Error:', error);
-                  alert('Terjadi kesalahan saat mengirim komentar.');
               }
-          });
-          komentarContainer.appendChild(komentarForm);
-          kontainerKode.appendChild(komentarContainer);
-
-          function tampilkanKomentar(comment, container) {
-            const komentarItem = document.createElement('div');
-            komentarItem.classList.add('komentar-item');
-            komentarItem.innerHTML = `
-                <p class="komentar-author">${comment.author}</p>
-                <p class="komentar-text">${comment.text}</p>
-            `;
-            container.appendChild(komentarItem);
-          }
-
-          async function ambilKomentar(kodeId, container) {
-            try {
-                const response = await fetch(`/api/kode/${kodeId}/comments`);
-                if (response.ok) {
-                    const comments = await response.json();
-                    comments.forEach(comment => tampilkanKomentar(comment, container));
-                } else {
-                    throw new Error('Gagal mengambil komentar.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
             }
-          }
 
-          ambilKomentar(item.id, komentarList);
+            ambilKomentar(item.id, komentarList);
 
-          containerUtama.appendChild(kontainerKode);
-          gsap.from(kontainerKode, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out" });
+            containerUtama.appendChild(kontainerKode);
+            gsap.from(kontainerKode, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out" });
         }
 
         async function ambilDataKode() {
@@ -247,6 +331,7 @@
                 const response = await fetch('/api/kode');
                 if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
                 const data = await response.json();
+                 // Urutkan berdasarkan timestamp (terbaru dulu)
                 data.sort((a, b) => b.timestamp - a.timestamp);
                 data.forEach(item => { buatKontainerKode(item); });
             } catch (error) { console.error('Gagal mengambil data:', error); }
@@ -258,105 +343,121 @@
           kontainerFile.classList.add('kontainer-file');
 
           const judulFile = document.createElement('h2');
-          judulFile.textContent = item.judul;
+          judulFile.textContent = item.filename; // Use item.filename directly
           judulFile.classList.add('judul-file');
           kontainerFile.appendChild(judulFile);
 
           const fileLink = document.createElement('a');
-          fileLink.textContent = item.originalname;
-          fileLink.href = '#';
+          fileLink.textContent = item.filename; // Use item.filename
+          fileLink.href = '#'; // Placeholder, akan diganti dengan URL download
           fileLink.classList.add('file-link');
+
           fileLink.addEventListener('click', async (event) => {
               event.preventDefault();
-              try {
-                  const response = await fetch(`/api/files/${item.id}`);
-                  if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                  const fileData = await response.json();
-
-                  const filePreview = document.createElement('div');
-                  filePreview.classList.add('file-preview');
-
-                  if (item.type === 'jpg' || item.type === 'jpeg' || item.type === 'png' || item.type === 'gif') {
-                    const img = document.createElement('img');
-                    img.src = fileData.file;
-                    img.alt = item.originalname;
-                    filePreview.appendChild(img);
-
-                } else if (item.type === 'txt' || item.type === 'md' || item.type === 'js' || item.type === 'css' || item.type === 'html') {
-                      const pre = document.createElement('pre');
-                      const code = document.createElement('code');
-                      const textContent = atob(fileData.file.split(',')[1]);
-                      code.textContent = textContent;
-                      pre.appendChild(code);
-                      filePreview.appendChild(pre);
-                      hljs.highlightElement(code);
-                  } else if (item.type === "pdf") {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = fileData.file;
-                    iframe.width = "100%";
-                    iframe.height = "500px";
-                    filePreview.appendChild(iframe);
-
-                  } else {
-                      filePreview.innerHTML = `<a href="${fileData.file}" download="${item.originalname}">Download ${item.originalname}</a>`;
-                  }
-                    kontainerFile.appendChild(filePreview);
-
-                  const link = document.createElement('a');
-                  link.href = fileData.file;
-                  link.download = fileData.originalname;
-                  link.click();
-
-                  const downloadResponse = await fetch(`/api/files/${item.id}/download`, { method: 'POST' });
-                  if (downloadResponse.ok) {
-                    const downloadData = await downloadResponse.json();
-                    const downloadCountEl = kontainerFile.querySelector('.download-count');
-                    if(downloadCountEl){
-                        downloadCountEl.textContent = downloadData.count;
+                try {
+                    // Dapatkan URL share (bukan direct download)
+                  const shareResponse = await fetch(`/api/files/${item.id}/share`);
+                    if (!shareResponse.ok) {
+                      const errorData = await shareResponse.json();
+                      throw new Error(errorData.message || 'Gagal mendapatkan URL share.');
                     }
+                    const shareData = await shareResponse.json();
+
+                  // Tampilkan URL share (gunakan cara yang lebih baik daripada alert)
+                  alert('Bagikan link ini: ' + shareData.shareUrl);
+
+                  } catch (error) {
+                      console.error('Gagal mendownload atau mendapatkan URL share:', error);
+                      alert('Terjadi kesalahan.');
                   }
-              }catch(error){ console.error('Gagal mendownload file atau update count:', error); alert('Terjadi kesalahan.');}
-            });
+
+          });
+
           kontainerFile.appendChild(fileLink);
 
           const infoCount = document.createElement('div');
           infoCount.classList.add('info-count');
 
-          const downloadCount = document.createElement('span');
-          downloadCount.classList.add('download-count');
-          downloadCount.textContent = item.downloadCount;
-          infoCount.appendChild(downloadCount);
+        //   const downloadCount = document.createElement('span');
+        //   downloadCount.classList.add('download-count');
+        //   downloadCount.textContent = item.downloadCount;
+        //   infoCount.appendChild(downloadCount);
 
           const likeCount = document.createElement('span');
           likeCount.classList.add('like-count');
-          likeCount.textContent = item.likes;
-          likeCount.addEventListener('click', async () => {
-            try {
-                const response = await fetch(`/api/files/${item.id}/like`, {method: 'POST'});
-                if(response.ok){
-                    const data = await response.json();
-                    likeCount.textContent = data.likes;
-                }
-            } catch (error) {
-                console.error("Gagal Like:", error)
+          likeCount.textContent = item.likes; // Gunakan item.likes
+
+            // Cek apakah sudah like
+            if (item.likedBy && item.likedBy.includes(getUserIP())) { // Fungsi getUserIP()
+                likeCount.classList.add('liked');
             }
+
+          likeCount.addEventListener('click', async () => {
+              try {
+                  const response = await fetch(`/api/files/${item.id}/like`, { method: 'POST' });
+                    if (response.ok) {
+                      const data = await response.json();
+                        likeCount.textContent = data.likes;
+                        if (data.liked) {
+                            likeCount.classList.add('liked');
+                        } else {
+                            likeCount.classList.remove('liked');
+                        }
+                    } else {
+                      const errorData = await response.json();
+                      alert(errorData.message || "Gagal Like File");
+                    }
+                } catch (error) {
+                    console.error('Gagal like:', error);
+                }
           });
           infoCount.appendChild(likeCount);
+
+            // --- Tombol Share ---
+          const tombolShare = document.createElement('button');
+          tombolShare.classList.add('tombol-share');
+          tombolShare.innerHTML = '<i class="fas fa-share"></i>'; // Ikon share
+          tombolShare.addEventListener('click', async () => {
+              try {
+                  const response = await fetch(`/api/files/${item.id}/share`);
+                  if (response.ok) {
+                      const data = await response.json();
+                      alert('Bagikan link ini: ' + data.shareUrl); // Tampilkan URL share
+                  } else {
+                  const errorData = await response.json();
+                  alert(errorData.message || "Gagal Generate Link Share");
+                  }
+              } catch (error) {
+                  console.error('Gagal mendapatkan URL share:', error);
+              }
+          });
+          infoCount.appendChild(tombolShare);
           kontainerFile.appendChild(infoCount);
           containerFile.appendChild(kontainerFile);
+
           gsap.from(kontainerFile, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out", delay: 0.2 });
         }
+
 
         async function ambilDataFile() {
             try {
                 const response = await fetch('/api/files');
                 if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
                 const data = await response.json();
+                 // Urutkan (jika perlu)
                 data.sort((a, b) => b.timestamp - a.timestamp);
                 data.forEach(item => { buatKontainerFile(item); });
             } catch (error) { console.error('Gagal mengambil data:', error); }
         }
 
+        // Fungsi untuk mendapatkan IP user (contoh, perlu disesuaikan)
+        function getUserIP() {
+            // Implementasi ini sangat sederhana dan mungkin tidak akurat.
+            // Dalam aplikasi nyata, Anda akan mendapatkan IP dari header
+            // request, atau menggunakan library seperti `request-ip`.
+            return '127.0.0.1'; // Ganti dengan cara yang benar untuk mendapatkan IP
+            // return '192.168.1.120';
+        }
         document.addEventListener('DOMContentLoaded', () => {
             ambilDataKode();
             ambilDataFile();
