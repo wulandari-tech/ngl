@@ -5,25 +5,33 @@ const app = express();
 const port = 3000;
 
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static(__dirname));
+app.use(express.static(__dirname)); // Ini akan serve file statis (HTML, CSS, JS, gambar, dll.)
+
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
+
 app.get('/lan', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
+
 // --- Endpoint Kode ---
 app.get('/api/kode', async (req, res) => {
     try {
         const data = await bacaData();
         res.json(data.kode);
-    } catch (error) { res.status(500).json({ message: 'Gagal membaca data kode.' }); }
+    } catch (error) {
+        console.error("Error in /api/kode GET:", error);
+        res.status(500).json({ message: 'Gagal membaca data kode.', error: error.message });
+    }
 });
 
 app.post('/api/kode', async (req, res) => {
     const { judul, kode } = req.body;
-    if (!judul || !kode) { return res.status(400).json({ message: 'Judul dan kode tidak boleh kosong.' }); }
-    try { // Perhatikan try ini
+    if (!judul || !kode) {
+        return res.status(400).json({ message: 'Judul dan kode tidak boleh kosong.' });
+    }
+    try {
         const data = await bacaData();
         const id = Date.now();
         const newData = { id, judul, kode, timestamp: id, copyCount: 0, likes: 0, comments: [] };
@@ -31,8 +39,9 @@ app.post('/api/kode', async (req, res) => {
         await simpanData(data);
         res.status(201).json(newData);
     } catch (error) {
-        res.status(500).json({ message: 'Gagal menyimpan kode.' });
-    } // Ini adalah penutup untuk try di atas
+        console.error("Error in /api/kode POST:", error);
+        res.status(500).json({ message: 'Gagal menyimpan kode.', error: error.message });
+    }
 });
 
 app.delete('/api/kode/:id', async (req, res) => {
@@ -43,11 +52,10 @@ app.delete('/api/kode/:id', async (req, res) => {
         await simpanData(data);
         res.status(200).json({ message: 'Kode berhasil dihapus.' });
     } catch (error) {
-        res.status(500).json({ message: 'Gagal menghapus kode.' });
+        console.error("Error in /api/kode DELETE:", error);
+        res.status(500).json({ message: 'Gagal menghapus kode.', error: error.message });
     }
 });
-//app.post('/api/kode/:id/copy', async (req, res) => { ... }); // Tidak berubah
-//app.post('/api/kode/:id/like', async (req, res) => { ... });  // Tidak berubah
 
 // Endpoint untuk Komentar
 app.get('/api/kode/:id/comments', async (req, res) => {
@@ -55,9 +63,14 @@ app.get('/api/kode/:id/comments', async (req, res) => {
     try {
         const data = await bacaData();
         const kodeItem = data.kode.find(item => item.id === id);
-        if (!kodeItem) { return res.status(404).json({ message: 'Kode tidak ditemukan.' }); }
-        res.json(kodeItem.comments); // Kirim komentar dari data.kode
-    } catch (error) { res.status(500).json({ message: 'Gagal mengambil komentar.' }); }
+        if (!kodeItem) {
+            return res.status(404).json({ message: 'Kode tidak ditemukan.' });
+        }
+        res.json(kodeItem.comments);
+    } catch (error) {
+        console.error("Error in /api/kode/:id/comments GET:", error);
+        res.status(500).json({ message: 'Gagal mengambil komentar.', error: error.message });
+    }
 });
 
 app.post('/api/kode/:id/comments', async (req, res) => {
@@ -71,36 +84,83 @@ app.post('/api/kode/:id/comments', async (req, res) => {
     try {
         const data = await bacaData();
         const kodeItem = data.kode.find(item => item.id === id);
-        if (!kodeItem) { return res.status(404).json({ message: 'Kode tidak ditemukan.' }); }
+        if (!kodeItem) {
+            return res.status(404).json({ message: 'Kode tidak ditemukan.' });
+        }
 
         const newComment = { id: Date.now(), author, text, timestamp: Date.now() };
-        kodeItem.comments.push(newComment); // Tambah komentar ke data.kode
-        await simpanData(data); // Simpan ke data.json!
+        kodeItem.comments.push(newComment);
+        await simpanData(data);
         res.status(201).json(newComment);
-    } catch (error) { res.status(500).json({ message: 'Gagal menambahkan komentar.' }); }
+    } catch (error) {
+        console.error("Error in /api/kode/:id/comments POST:", error);
+        res.status(500).json({ message: 'Gagal menambahkan komentar.', error: error.message });
+    }
 });
 
 // --- Endpoint File ---
-app.get('/api/files', async (req, res) => { ... }); // Tidak berubah
-app.post('/api/files', async (req, res) => { ... });  // Tidak berubah
-app.get('/api/files/:id', async (req, res) => { ... }); // Tidak berubah
-app.delete('/api/files/:id', async (req, res) => { ... }); // Tidak berubah
-app.post('/api/files/:id/download', async (req, res) => { ... }); // Tidak berubah
-//app.post('/api/files/:id/like', async (req, res) => { ... });  // Tidak berubah
+app.get('/api/files', async (req, res) => {
+    try {
+        const data = await bacaData();
+        res.json(data.files);
+    } catch (error) {
+        console.error("Error in /api/files GET:", error);
+        res.status(500).json({ message: 'Gagal mengambil daftar file.', error: error.message });
+    }
+});
 
 // --- Fungsi Bantu ---
+
+// Inisialisasi data.json jika belum ada
+async function initDataFile() {
+    try {
+        await fs.access('data.json'); // Cek apakah file ada
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            // Jika tidak ada, buat file dengan struktur awal
+            await fs.writeFile('data.json', JSON.stringify({ kode: [], files: [] }, null, 2), 'utf8');
+            console.log('data.json created.');
+        } else {
+            console.error('Error accessing data.json:', error);
+            // Anda mungkin ingin keluar dari proses di sini, karena tidak bisa membaca/menulis file data.
+            process.exit(1); // Keluar dengan kode error
+        }
+    }
+}
+
 async function bacaData() {
     try {
         const data = await fs.readFile('data.json', 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        if (error.code === 'ENOENT') { return { kode: [], files: [] }; }
-        throw error;
+        if (error.code === 'ENOENT') {
+            // Seharusnya tidak akan sampai ke sini lagi, karena sudah di-handle di initDataFile
+            console.warn("data.json not found (unexpected). Returning empty data.");
+            return { kode: [], files: [] };
+        } else if (error instanceof SyntaxError) {
+            console.error("data.json is corrupt (invalid JSON).  Returning empty data.");
+            return { kode: [], files: [] };
+        }
+        console.error("Unhandled error reading data.json:", error);
+        throw error; // Re-throw error yang tidak bisa ditangani
     }
 }
 
 async function simpanData(data) {
-    await fs.writeFile('data.json', JSON.stringify(data, null, 2), 'utf8');
+    try {
+        await fs.writeFile('data.json', JSON.stringify(data, null, 2), 'utf8');
+    } catch(error) {
+        console.error("Error writing to data.json:", error);
+        throw error; // Penting untuk re-throw, agar error ditangani di endpoint
+    }
 }
 
-app.listen(port, () => { console.log(`Server berjalan di http://localhost:${port}`); });
+
+// Jalankan inisialisasi *sebelum* server mulai mendengarkan
+initDataFile().then(() => {
+    app.listen(port, () => {
+        console.log(`Server berjalan di http://localhost:${port}`);
+    });
+}).catch(err => {
+    console.error("Failed to initialize data file:", err);
+});
