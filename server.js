@@ -7,13 +7,12 @@ const app = express();
 const port = 3000;
 
 app.use(express.json({ limit: '50mb' }));  // Sesuaikan jika perlu
-app.use(express.static(__dirname));
-
-// ... (endpoint /, /admin, dll.) ...
-
-// --- Endpoint Kode ---
-
-// ... (GET /api/kode, POST /api/kode) ...
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html')); // Kirim file index.html
+});
+app.get('/lan', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html')); // Kirim file index.html
+});
 app.get('/api/kode', async (req, res) => {
     try {
         const data = await bacaData();
