@@ -47,7 +47,7 @@ app.delete('/api/kode/:id', async (req, res) => {
     }
 });
 app.post('/api/kode/:id/copy', async (req, res) => { ... }); // Tidak berubah
-app.post('/api/kode/:id/like', async (req, res) => { ... });  // Tidak berubah
+//app.post('/api/kode/:id/like', async (req, res) => { ... });  // Tidak berubah
 
 // Endpoint untuk Komentar
 app.get('/api/kode/:id/comments', async (req, res) => {
