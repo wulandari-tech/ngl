@@ -86,7 +86,7 @@ app.post('/api/files', async (req, res) => { ... });  // Tidak berubah
 app.get('/api/files/:id', async (req, res) => { ... }); // Tidak berubah
 app.delete('/api/files/:id', async (req, res) => { ... }); // Tidak berubah
 app.post('/api/files/:id/download', async (req, res) => { ... }); // Tidak berubah
-app.post('/api/files/:id/like', async (req, res) => { ... });  // Tidak berubah
+//app.post('/api/files/:id/like', async (req, res) => { ... });  // Tidak berubah
 
 // --- Fungsi Bantu ---
 async function bacaData() {
