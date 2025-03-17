@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>share wanzofc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Roboto Mono', monospace; background-color: #000; color: #fff; line-height: 1.6; overflow-x: hidden;  padding-bottom: 50px;}
+      h1, h2 { font-family: 'Poppins', sans-serif; text-align: center; margin-bottom: 1rem; color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+      h1 { font-size: 2.5rem; margin-top: 2rem; margin-bottom: 2rem;}
+      #container-utama, #container-file { display: flex; flex-direction: column; gap: 2rem; padding: 20px; max-width: 900px; margin: 0 auto; }
+      .kontainer-kode { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); }
+      .kontainer-kode:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-kode pre { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; max-height: 150px; overflow: hidden; transition: max-height 0.5s ease; }
+      .kontainer-kode.expanded pre { max-height: 1000px; }
+      .kontainer-kode .tombol-copy { position: absolute; top: 10px; right: 10px; background-color: #00ffff; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color: 0.3s, transform 0.3s; }
+      .kontainer-kode .tombol-copy:hover { background-color: #00d1d1; transform: scale(1.05); }
+      .kontainer-kode .judul-kode { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      .kontainer-file { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-bottom: 1rem;}
+      .kontainer-file:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 255, 255, 0.3); }
+      .kontainer-file .file-link { color: #00ffff; text-decoration: none; font-weight: bold; display: inline-block; transition: color 0.3s, transform 0.3s; }
+      .kontainer-file .file-link::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 8px; }
+      .kontainer-file .file-link:hover { color: #00d1d1; transform: translateX(5px); }
+      .kontainer-file .judul-file { font-size: 1.2rem; color: #00ffff; margin-bottom: 0.5rem; }
+      #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+      .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
+      .modal-konten { background-color: #111; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; border-radius: 8px; position: relative; }
+      .modal-konten pre{ white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; }
+      .tutup-modal { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+      .tutup-modal:hover, .tutup-modal:focus { color: #fff; text-decoration: none; }
+      .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s, color 0.3s; display: block; margin: 10px auto 0; font-size: 0.8rem;}
+      .tombol-load-more:hover { background-color: #00ffff; color: #000; }
+      .judul-kode-modal, .judul-file-modal { font-size: 1.5rem; color: #00ffff; margin-bottom: 1rem; border-bottom: 2px solid rgba(0, 255, 255, 0.5); padding-bottom: 0.5rem;}
+      .info-count { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; display: flex; align-items: center; gap: 10px; }
+      .copy-count, .download-count, .like-count, .comment-count { margin-left: 5px; display: flex; align-items: center; }
+      .copy-count::before { content: '\f0c5'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .download-count::before { content: '\f019'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .like-count::before { content: '\f164'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; cursor: pointer; }
+        .like-count.liked::before {
+          color: red;
+        }
+      .comment-count::before { content: '\f075'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-right: 5px; }
+      .komentar-container { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0, 255, 255, 0.3); }
+      .komentar-item { margin-bottom: 0.8rem; padding: 0.5rem; border-radius: 4px; background-color: rgba(255, 255, 255, 0.05); }
+      .komentar-author { font-weight: bold; color: #00ffff; }
+      .komentar-text { color: #ddd; }
+      .komentar-form { margin-top: 1rem; }
+      .komentar-form input[type="text"], .komentar-form textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid rgba(0, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; font-family: 'Roboto Mono', monospace; }
+      .komentar-form button { background-color: #00ffff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+      .komentar-form button:hover { background-color: #00d1d1; }
+      .file-preview { margin-top: 1rem; text-align: center; }
+      .file-preview img { max-width: 100%; max-height: 200px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
+      .file-preview a { color: #00ffff; text-decoration: none; }
+        .tombol-share {
+            background-color: transparent;
+            color: #00ffff;
+            border: none;
+            padding: 0;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tombol-share i {
+            margin-right: 0;
+        }
+        .tombol-share:hover {
+            color: #00d1d1;
+        }
+
+        #modal-share {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        #modal-share-konten {
+            background-color: #222;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        #modal-share-konten .tutup-modal {
+          color: #aaa;
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          font-size: 28px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        #modal-share-konten input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 10px;
+            border: 1px solid #00ffff;
+            background-color: transparent;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 4px;
+             margin-right: 0;
+        }
+
+        #modal-share-konten .tombol-copy-url {
+          background-color: transparent;
+          color: #00ffff;
+          border: none;
+          padding: 0;
+          font-size: 1rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 39px;
+          margin-left: 0px;
+        }
+        #modal-share-url-container {
+          display: flex;
+          align-items: center;
+        }
+
+        #modal-share-konten .tombol-copy-url:hover {
+            color: #00d1d1;
+        }
+
+        #modal-share-konten h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+        #modal-share-konten p{
+          margin-bottom: 10px;
+          color: #fff;
+          font-size: 0.9rem;
+        }
+      #detail-kode-container {
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 20px;
+          background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(0, 255, 255, 0.5);
+          border-radius: 8px;
+      }
+
+      #detail-kode-container .judul-kode {
+          font-size: 1.5rem;
+          color: #00ffff;
+          margin-bottom: 1rem;
+      }
+
+      #detail-kode-container pre {
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          font-size: 1rem;
+          color: #eee;
+          line-height: 1.4;
+      }
+
+      #detail-kode-container .info-count {
+          margin-top: 1rem;
+      }
+      #detail-kode-container .komentar-container{
+        margin-top: 1rem;
+      }
+      #kembali-ke-list{
+        display: flex;
+        margin: auto;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        color: #00ffff;
+        border: 2px solid #00ffff;
+        padding: 10px;
+        border-radius: 4px;
+        transition: 0.3s;
+      }
+      #kembali-ke-list:hover{
+        background-color:#00ffff;
+        color:#000;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div id="detail-kode-container" style="display: none;">
+        <h2 class="judul-kode"></h2>
+        <pre></pre>
+        <div class="info-count">
+        </div>
+        <div class="komentar-container">
+        </div>
+         <button id="kembali-ke-list">Kembali</button>
+    </div>
+
+    <div id='konten-utama'>
+      <h1>TEMPLATE HTML</h1>
+      <div id="container-utama"></div>
+
+      <h1>FOR FILE</h1>
+      <div id="container-file"></div>
+    </div>
+
+    <div id="modal-kode" class="modal">
+        <div class="modal-konten">
+            <span class="tutup-modal">×</span>
+             <h2 class="judul-kode-modal"></h2>
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="modal-share" class="modal">
+        <div id="modal-share-konten">
+          <span class="tutup-modal">×</span>
+            <h3>share kode ini</h3>
+            <p>salin irl dibawah ini:</p>
+            <div id="modal-share-url-container">
+              <input type="text" id="modal-share-url" readonly>
+              <button class="tombol-copy-url"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script>
+      particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, }, "opacity": { "value": 0.7, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } }, "retina_detect": true });
+
+      const modal = document.getElementById('modal-kode');
+      const tutupModal = document.querySelector('.tutup-modal');
+      const modalPre = document.querySelector('#modal-kode pre');
+      const judulModal = document.querySelector('#modal-kode .judul-kode-modal');
+
+      function tutupModalHandler(modalElement) {
+          modalElement.style.display = 'none';
+      }
+
+      document.querySelectorAll('.tutup-modal').forEach(button => {
+          button.addEventListener('click', () => {
+              tutupModalHandler(button.closest('.modal'));
+          });
+      });
+      window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+          event.target.style.display = 'none';
+        }
+      });
+
+      function slugify(text) {
+        return text.toString().toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '');
+      }
+
+      async function tampilkanDetailKode(id, slug) {
+          try {
+              const response = await fetch(`/api/kode/${id}/share`);
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal mengambil detail kode.');
+              }
+              const { shareUrl } = await response.json();
+              const urlParts = shareUrl.split('/');
+              const fetchedId = urlParts[urlParts.length - 2];
+              const fetchedSlug = urlParts[urlParts.length - 1];
+
+              const detailResponse = await fetch(`/kode/${fetchedId}/${fetchedSlug}`);
+                if (!detailResponse.ok) {
+                  const errorData = await detailResponse.json();
+                  throw new Error(errorData.message || 'Gagal mengambil detail kode.');
+                }
+                const kodeItem = await detailResponse.json();
+
+              document.getElementById('konten-utama').style.display = 'none';
+              const detailContainer = document.getElementById('detail-kode-container');
+              detailContainer.style.display = 'block';
+
+              detailContainer.querySelector('.judul-kode').textContent = kodeItem.judul;
+              const pre = detailContainer.querySelector('pre');
+              pre.textContent = kodeItem.kode;
+              hljs.highlightElement(pre);
+
+              const infoCount = detailContainer.querySelector('.info-count');
+              infoCount.innerHTML = `
+                  <span class="copy-count"><i class="fas fa-copy"></i> ${kodeItem.copyCount}</span>
+                  <span class="like-count"><i class="fas fa-thumbs-up"></i> ${kodeItem.likes}</span>
+                  <span class="comment-count"><i class="fas fa-comments"></i> ${kodeItem.comments.length}</span>
+              `;
+
+              const komentarContainer = detailContainer.querySelector('.komentar-container');
+              komentarContainer.innerHTML = '';
+
+              const komentarList = document.createElement('div');
+                komentarList.classList.add('komentar-list');
+                komentarContainer.appendChild(komentarList);
+
+                const komentarForm = document.createElement('form');
+                komentarForm.classList.add('komentar-form');
+                komentarForm.innerHTML = `
+                    <input type="text" name="author" placeholder="Nama Anda" required>
+                    <textarea name="text" placeholder="Komentar Anda" required></textarea>
+                    <button type="submit">Kirim Komentar</button>
+                `;
+
+                komentarForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const author = komentarForm.elements.author.value;
+                    const text = komentarForm.elements.text.value;
+                    if (!author || !text) {
+                      alert("Nama dan Komentar Harus Di isi");
+                      return;
+                    }
+
+                    try {
+                        const response = await fetch(`/api/kode/${kodeItem.id}/comments`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ author, text }),
+                        });
+                        if (response.ok) {
+                            const newComment = await response.json();
+                            tampilkanKomentar(newComment, komentarList);
+                            komentarForm.reset();
+                            detailContainer.querySelector('.comment-count').textContent =  parseInt(detailContainer.querySelector('.comment-count').textContent) + 1;
+
+                        } else {
+                          const errorData = await response.json();
+                          alert(errorData.message || "Gagal mengirim komentar")
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim komentar.');
+                    }
+                });
+                komentarContainer.appendChild(komentarForm);
+
+                function tampilkanKomentar(comment, container) {
+                  const komentarItem = document.createElement('div');
+                  komentarItem.classList.add('komentar-item');
+                  komentarItem.innerHTML = `
+                      <p class="komentar-author">${comment.author}</p>
+                      <p class="komentar-text">${comment.text}</p>
+                  `;
+                  container.appendChild(komentarItem);
+                }
+
+                async function ambilKomentar(kodeId, container) {
+                  try {
+                      const response = await fetch(`/api/kode/${kodeId}/comments`);
+                      if (response.ok) {
+                          const comments = await response.json();
+                          comments.forEach(comment => tampilkanKomentar(comment, container));
+                      } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Gagal mengambil komentar.');
+
+                      }
+                  } catch (error) {
+                      console.error('Error:', error);
+                  }
+                }
+
+                ambilKomentar(kodeItem.id, komentarList);
+
+
+          } catch (error) {
+              console.error('Gagal menampilkan detail kode:', error);
+              alert('Gagal menampilkan detail kode.');
+          }
+      }
+
+      function buatKontainerKode(item) {
+        const containerUtama = document.getElementById('container-utama');
+        const kontainerKode = document.createElement('div');
+        kontainerKode.classList.add('kontainer-kode');
+
+        const judul = document.createElement('h2');
+        judul.textContent = item.judul;
+        judul.classList.add('judul-kode');
+        kontainerKode.appendChild(judul);
+
+        const pre = document.createElement('pre');
+        const code = document.createElement('code');
+        code.textContent = item.kode;
+        pre.appendChild(code);
+        kontainerKode.appendChild(pre);
+        hljs.highlightElement(code);
+
+        if (item.kode.length > 200) {
+            const tombolLoadMore = document.createElement('button');
+            tombolLoadMore.textContent = 'Load More';
+            tombolLoadMore.classList.add('tombol-load-more');
+            tombolLoadMore.addEventListener('click', () => {
+              modalPre.textContent = item.kode;
+              judulModal.textContent = item.judul;
+              modal.style.display = 'block';
+            });
+            kontainerKode.appendChild(tombolLoadMore);
+        }
+
+        const tombolCopy = document.createElement('button');
+        tombolCopy.textContent = 'Copy';
+        tombolCopy.classList.add('tombol-copy');
+        tombolCopy.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(item.kode);
+                gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                alert('Kode berhasil disalin!');
+
+                const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const copyCountEl = kontainerKode.querySelector('.copy-count');
+                    if (copyCountEl) { copyCountEl.textContent = data.copyCount; }
+                } else {
+                  const errorData = await response.json();
+                  alert(errorData.message || 'Gagal menyalin kode.');
+                }
+            } catch (err) {
+                console.error('Gagal menyalin:', err);
+            }
+        });
+        kontainerKode.appendChild(tombolCopy);
+
+        const infoCount = document.createElement('div');
+        infoCount.classList.add('info-count');
+
+        const copyCount = document.createElement('span');
+        copyCount.classList.add('copy-count');
+        copyCount.textContent = item.copyCount;
+        infoCount.appendChild(copyCount);
+
+        const likeCount = document.createElement('span');
+        likeCount.classList.add('like-count');
+        likeCount.textContent = item.likes;
+
+        if (item.likedBy && item.likedBy.includes(getUserIP())) {
+            likeCount.classList.add('liked');
+        }
+
+        likeCount.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/kode/${item.id}/like`, { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    likeCount.textContent = data.likes;
+                    if (data.liked) { likeCount.classList.add('liked'); }
+                    else { likeCount.classList.remove('liked'); }
+                } else {
+                  const errorData = await response.json();
+                  alert(errorData.message || 'Gagal menyukai kode.');
+                }
+            } catch (error) {
+                console.error('Gagal like:', error);
+            }
+        });
+        infoCount.appendChild(likeCount);
+
+        const commentCount = document.createElement('span');
+        commentCount.classList.add('comment-count');
+        commentCount.textContent = item.comments.length;
+        infoCount.appendChild(commentCount);
+
+        const tombolShare = document.createElement('button');
+        tombolShare.classList.add('tombol-share');
+        tombolShare.innerHTML = '<i class="fas fa-share"></i>';
+        tombolShare.addEventListener('click', async () => {
+          try {
+            const response = await fetch(`/api/kode/${item.id}/share`);
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Gagal Generate Link");
+              }
+              const { shareUrl } = await response.json();
+
+                const modalShare = document.getElementById('modal-share');
+                const modalShareUrlInput = document.getElementById('modal-share-url');
+                modalShareUrlInput.value = shareUrl;
+                modalShare.style.display = 'block';
+
+                document.querySelector('#modal-share .tombol-copy-url').onclick = () => {
+                  modalShareUrlInput.select();
+                  document.execCommand('copy');
+                  gsap.to(document.querySelector('#modal-share .tombol-copy-url'), { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                  alert('URL berhasil disalin!');
+                };
+
+
+          }  catch (error) {
+              console.error('Gagal mendapatkan URL share:', error);
+              alert("Gagal Generate Link Share")
+          }
+      });
+        infoCount.appendChild(tombolShare);
+        kontainerKode.appendChild(infoCount);
+
+        const komentarContainer = document.createElement('div');
+        komentarContainer.classList.add('komentar-container');
+
+        const komentarList = document.createElement('div');
+        komentarList.classList.add('komentar-list');
+        komentarContainer.appendChild(komentarList);
+
+        const komentarForm = document.createElement('form');
+        komentarForm.classList.add('komentar-form');
+        komentarForm.innerHTML = `
+            <input type="text" name="author" placeholder="Nama Anda" required>
+            <textarea name="text" placeholder="Komentar Anda" required></textarea>
+            <button type="submit">Kirim Komentar</button>
+        `;
+        komentarForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const author = komentarForm.elements.author.value;
+            const text = komentarForm.elements.text.value;
+
+            if (!author || !text) {
+              alert("Nama dan Komentar Harus Di isi");
+              return;
+            }
+
+            try {
+                const response = await fetch(`/api/kode/${item.id}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author, text }),
+                });
+                if (response.ok) {
+                    const newComment = await response.json();
+                    tampilkanKomentar(newComment, komentarList);
+                    komentarForm.reset();
+                    commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || "Gagal mengirim komentar")
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mengirim komentar.');
+            }
+        });
+        komentarContainer.appendChild(komentarForm);
+
+        function tampilkanKomentar(comment, container) {
+          const komentarItem = document.createElement('div');
+          komentarItem.classList.add('komentar-item');
+          komentarItem.innerHTML = `
+              <p class="komentar-author">${comment.author}</p>
+              <p class="komentar-text">${comment.text}</p>
+          `;
+          container.appendChild(komentarItem);
+        }
+
+        async function ambilKomentar(kodeId, container) {
+          try {
+                            const response = await fetch(`/api/kode/${kodeId}/comments`);
+              if (response.ok) {
+                  const comments = await response.json();
+                  comments.forEach(comment => tampilkanKomentar(comment, container));
+              } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal mengambil komentar.');
+
+              }
+          } catch (error) {
+              console.error('Error:', error);
+          }
+        }
+
+        ambilKomentar(item.id, komentarList);
+
+        kontainerKode.appendChild(komentarContainer);
+
+        containerUtama.appendChild(kontainerKode);
+        gsap.from(kontainerKode, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out" });
+        }
+
+        async function ambilDataKode() {
+        try {
+            const response = await fetch('/api/kode');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            data.sort((a, b) => b.timestamp - a.timestamp);
+            data.forEach(item => { buatKontainerKode(item); });
+        } catch (error) {
+            console.error('Gagal mengambil data:', error);
+            alert('Terjadi kesalahan: ' + error.message);
+        }
+        }
+
+        function buatKontainerFile(item) {
+        const containerFile = document.getElementById('container-file');
+        const kontainerFile = document.createElement('div');
+        kontainerFile.classList.add('kontainer-file');
+
+        const judulFile = document.createElement('h2');
+        judulFile.textContent = item.filename;
+        judulFile.classList.add('judul-file');
+        kontainerFile.appendChild(judulFile);
+
+        const fileLink = document.createElement('a');
+        fileLink.textContent = item.filename;
+        fileLink.href = '#';
+        fileLink.classList.add('file-link');
+
+        fileLink.addEventListener('click', async (event) => {
+            event.preventDefault();
+            try {
+                const shareResponse = await fetch(`/api/files/${item.id}/share`);
+                if (!shareResponse.ok) {
+                    const errorData = await shareResponse.json();
+                    throw new Error(errorData.message || 'Gagal mendapatkan URL share.');
+                }
+                const shareData = await shareResponse.json();
+
+                const modalShare = document.getElementById('modal-share');
+                const modalShareUrlInput = document.getElementById('modal-share-url');
+                    modalShareUrlInput.value = shareData.shareUrl;
+                    modalShare.style.display = 'block';
+
+                    document.querySelector('#modal-share .tombol-copy-url').onclick = () => {
+                      modalShareUrlInput.select();
+                      document.execCommand('copy');
+                      gsap.to(document.querySelector('#modal-share .tombol-copy-url'), { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                      alert('URL berhasil disalin!');
+                    };
+
+
+            } catch (error) {
+                console.error('Gagal mendownload atau mendapatkan URL share:', error);
+                alert('Terjadi kesalahan.');
+            }
+
+        });
+
+        kontainerFile.appendChild(fileLink);
+
+        const infoCount = document.createElement('div');
+        infoCount.classList.add('info-count');
+
+        const likeCount = document.createElement('span');
+        likeCount.classList.add('like-count');
+        likeCount.textContent = item.likes;
+
+        if (item.likedBy && item.likedBy.includes(getUserIP())) {
+            likeCount.classList.add('liked');
+        }
+
+        likeCount.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/files/${item.id}/like`, { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    likeCount.textContent = data.likes;
+                    if (data.liked) {
+                        likeCount.classList.add('liked');
+                    } else {
+                        likeCount.classList.remove('liked');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || "Gagal Like File");
+                }
+            } catch (error) {
+                console.error('Gagal like:', error);
+            }
+        });
+        infoCount.appendChild(likeCount);
+
+        const tombolShare = document.createElement('button');
+        tombolShare.classList.add('tombol-share');
+        tombolShare.innerHTML = '<i class="fas fa-share"></i>';
+        tombolShare.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/files/${item.id}/share`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal mendapatkan URL share.');
+                }
+                const { shareUrl } = await response.json();
+
+                const modalShare = document.getElementById('modal-share');
+                const modalShareUrlInput = document.getElementById('modal-share-url');
+                modalShareUrlInput.value = shareUrl;
+                modalShare.style.display = 'block';
+
+                document.querySelector('#modal-share .tombol-copy-url').onclick = () => {
+                    modalShareUrlInput.select();
+                    document.execCommand('copy');
+                    gsap.to(document.querySelector('#modal-share .tombol-copy-url'), { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1, });
+                    alert('URL berhasil disalin!');
+                };
+            } catch (error) {
+                console.error('Gagal mendapatkan URL share:', error);
+                alert('Terjadi kesalahan.');
+            }
+        });
+
+        infoCount.appendChild(tombolShare);
+        kontainerFile.appendChild(infoCount);
+        containerFile.appendChild(kontainerFile);
+
+        gsap.from(kontainerFile, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out", delay: 0.2 });
+        }
+
+
+        async function ambilDataFile() {
+            try {
+                const response = await fetch('/api/files');
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+
+                }
+                const data = await response.json();
+                data.sort((a, b) => b.timestamp - a.timestamp);
+                data.forEach(item => { buatKontainerFile(item); });
+            } catch (error) {
+                console.error('Gagal mengambil data:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+
+            }
+        }
+
+        function getUserIP() {
+        return '127.0.0.1';
+        }
+
+        function cekUrlDanTampilkanDetail() {
+          const path = window.location.pathname;
+          const parts = path.split('/');
+          if (parts.length === 4 && parts[1] === 'kode') {
+            const id = parseInt(parts[2], 10);
+            const slug = parts[3];
+            if (!isNaN(id)) {
+              tampilkanDetailKode(id, slug);
+              return;
+            }
+          }
+            ambilDataKode();
+            ambilDataFile();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+        cekUrlDanTampilkanDetail();
+        const kembaliKeListButton = document.getElementById('kembali-ke-list');
+        if(kembaliKeListButton){
+            kembaliKeListButton.addEventListener('click', () => {
+              document.getElementById('detail-kode-container').style.display = 'none';
+              document.getElementById('konten-utama').style.display = 'block';
+               history.pushState(null, null, '/');
+                ambilDataKode();
+                ambilDataFile();
+
+          });
+        }
+        });
+
+    </script>
+</body>
+</html>
