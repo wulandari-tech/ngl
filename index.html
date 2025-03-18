@@ -33,7 +33,7 @@
       .modal-konten pre{ white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; color: #eee; line-height: 1.4; }
       .tutup-modal { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
       .tutup-modal:hover, .tutup-modal:focus { color: #fff; text-decoration: none; }
-      .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s, color 0.3s; display: block; margin: 10px auto 0; font-size: 0.8rem;}
+      .tombol-load-more { background-color: transparent; color: #00ffff; border: 2px solid #00ffff; padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: background-color: 0.3s, color: 0.3s; display: block; margin: 10px auto 0; font-size: 0.8rem;}
       .tombol-load-more:hover { background-color: #00ffff; color: #000; }
       .judul-kode-modal, .judul-file-modal { font-size: 1.5rem; color: #00ffff; margin-bottom: 1rem; border-bottom: 2px solid rgba(0, 255, 255, 0.5); padding-bottom: 0.5rem;}
       .info-count { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; display: flex; align-items: center; gap: 10px; }
@@ -51,7 +51,7 @@
       .komentar-text { color: #ddd; }
       .komentar-form { margin-top: 1rem; }
       .komentar-form input[type="text"], .komentar-form textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid rgba(0, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; font-family: 'Roboto Mono', monospace; }
-      .komentar-form button { background-color: #00ffff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+      .komentar-form button { background-color: #00ffff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color: 0.3s; }
       .komentar-form button:hover { background-color: #00d1d1; }
       .file-preview { margin-top: 1rem; text-align: center; }
       .file-preview img { max-width: 100%; max-height: 200px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
@@ -199,11 +199,150 @@
         color:#000;
         cursor: pointer;
       }
+
+      /* Gaya untuk tombol request dan donasi */
+        .tombol-request {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #00ffff;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 1000; /* Pastikan tombol di atas konten lain */
+        }
+        .tombol-request:hover {
+            background-color: #00d1d1;
+            transform: scale(1.05);
+        }
+        .tombol-request i {
+            margin-right: 5px;
+        }
+
+      .tombol-donasi {
+          position: fixed;
+          top: 10px;
+          left: 10px;
+          background-color: #00ffff;
+          color: #000;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background-color 0.3s, transform 0.3s;
+            z-index: 1000;
+      }
+      .tombol-donasi:hover {
+            background-color: #00d1d1;
+          transform: scale(1.05);
+        }
+        .tombol-donasi i {
+            margin-right: 5px;
+        }
+      #modal-donasi {
+            display: none;
+            position: fixed;
+            z-index: 1001; /* Lebih tinggi dari tombol */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+      }
+       #modal-donasi-konten {
+            background-color: #222;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        #modal-donasi-konten .tutup-modal {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #modal-donasi-konten h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+      #modal-donasi-konten p{
+          margin-bottom: 10px;
+          color: #fff;
+          font-size: 0.9rem;
+        }
+
+        #modal-donasi-konten .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #modal-donasi-konten input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #00ffff;
+            background-color: transparent;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 4px;
+        }
+
+        #modal-donasi-konten .tombol-salin {
+            background-color: #00ffff;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
+             display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #modal-donasi-konten .tombol-salin i{
+          margin-right: 5px;
+        }
+        #modal-donasi-konten .tombol-salin:hover{
+          background-color: #00d1d1;
+        }
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
-
+    <button class="tombol-request" onclick="window.location.href='https://bot-production-2154.up.railway.app'">
+        <i class="fas fa-inbox"></i> REQUEST
+    </button> 
+    <button class="tombol-donasi"><i class="fas fa-wallet"></i>DONASI</button>
+    <div id="modal-donasi" class="modal">
+        <div id="modal-donasi-konten">
+            <span class="tutup-modal">×</span>
+            <h3>Donasi via DANA</h3>
+            <p>Nomor DANA:</p>
+            <div class="input-group">
+                <input type="text" id="nomor-dana" value="0895402567224" readonly>
+                <button class="tombol-salin"><i class="fas fa-copy"></i>Salin</button>
+            </div>
+        </div>
+    </div>
     <div id="detail-kode-container" style="display: none;">
         <h2 class="judul-kode"></h2>
         <pre></pre>
@@ -213,15 +352,12 @@
         </div>
          <button id="kembali-ke-list">Kembali</button>
     </div>
-
     <div id='konten-utama'>
       <h1>TEMPLATE HTML</h1>
       <div id="container-utama"></div>
-
       <h1>FOR FILE</h1>
       <div id="container-file"></div>
     </div>
-
     <div id="modal-kode" class="modal">
         <div class="modal-konten">
             <span class="tutup-modal">×</span>
@@ -229,31 +365,56 @@
             <pre></pre>
         </div>
     </div>
-
     <div id="modal-share" class="modal">
         <div id="modal-share-konten">
           <span class="tutup-modal">×</span>
             <h3>share kode ini</h3>
-            <p>salin irl dibawah ini:</p>
+            <p>salin url dibawah ini:</p>
             <div id="modal-share-url-container">
               <input type="text" id="modal-share-url" readonly>
               <button class="tombol-copy-url"><i class="fas fa-copy"></i></button>
             </div>
         </div>
-    </div>
-
+ </div>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
     <script>
-      particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, }, "opacity": { "value": 0.7, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } }, "retina_detect": true });
-
+      particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, }, "opacity": { "value": 0.7, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffff", "opacity": 0.4, "width": 3 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } }, "retina_detect": true });
       const modal = document.getElementById('modal-kode');
       const tutupModal = document.querySelector('.tutup-modal');
       const modalPre = document.querySelector('#modal-kode pre');
       const judulModal = document.querySelector('#modal-kode .judul-kode-modal');
+
+        // Modal donasi
+      const modalDonasi = document.getElementById('modal-donasi');
+      const tombolDonasi = document.querySelector('.tombol-donasi');
+      const tutupModalDonasi = document.querySelector('#modal-donasi .tutup-modal');
+      const tombolSalin = document.querySelector('.tombol-salin');
+      const nomorDanaInput = document.getElementById('nomor-dana');
+
+      tombolDonasi.addEventListener('click', () => {
+          modalDonasi.style.display = 'block';
+      });
+
+      tutupModalDonasi.addEventListener('click', () => {
+          modalDonasi.style.display = 'none';
+      });
+
+      tombolSalin.addEventListener('click', () => {
+          nomorDanaInput.select();
+          document.execCommand('copy');
+          gsap.to(tombolSalin, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+          alert('Nomor DANA berhasil disalin!');
+      });
+        //tutup modal donasi
+       window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+          event.target.style.display = 'none';
+        }
+      });
+
 
       function tutupModalHandler(modalElement) {
           modalElement.style.display = 'none';
@@ -264,11 +425,7 @@
               tutupModalHandler(button.closest('.modal'));
           });
       });
-      window.addEventListener('click', (event) => {
-        if (event.target.classList.contains('modal')) {
-          event.target.style.display = 'none';
-        }
-      });
+
 
       function slugify(text) {
         return text.toString().toLowerCase()
@@ -441,7 +598,7 @@
                     if (copyCountEl) { copyCountEl.textContent = data.copyCount; }
                 } else {
                   const errorData = await response.json();
-                  alert(errorData.message || 'Gagal menyalin kode.');
+                                    alert(errorData.message || 'Gagal menyalin kode.');
                 }
             } catch (err) {
                 console.error('Gagal menyalin:', err);
