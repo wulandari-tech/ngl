@@ -422,4 +422,45 @@ app.get('/files/:id/:slug', async (req, res) => {
     }
 });
 
+// --- DOWNLOAD LOGIC (PENTING!) ---
+
+app.get('/download/:id/:slug', async (req, res) => { // Gunakan route yang berbeda, /download/:id/:slug
+    const id = parseInt(req.params.id, 10);
+    const slug = req.params.slug;
+
+    try {
+        const data = await bacaData();
+        const file = data.files.find(item => item.id === id && item.slug === slug); // Find by ID *and* slug
+        if (!file) {
+            return res.status(404).send('File not found.'); // Lebih baik send() daripada json() untuk error sederhana
+        }
+
+        const filePath = path.join(__dirname, file.path);
+
+        // Cek apakah file benar-benar ada di sistem file
+        try {
+            await fs.access(filePath); // Cek keberadaan file.  fs.access *lebih baik* daripada fs.exists (deprecated)
+        } catch (err) {
+            console.error("File does not exist on the filesystem:", filePath);
+            return res.status(404).send('File not found on server.');
+        }
+        res.download(filePath, file.filename, (err) => {
+            if (err) {
+                // Tangani error *setelah* mencoba mengirim header
+                console.error("Error during download:", err);
+                if (!res.headersSent) {  // Periksa apakah header sudah dikirim
+                    res.status(500).send('Failed to download file.');
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error in download route:", error);
+        if (!res.headersSent) {
+            res.status(500).send('Internal Server Error');
+        }
+    }
+});
+
+
 app.listen(port, () => { console.log(`Server berjalan di http://localhost:${port}`); });
