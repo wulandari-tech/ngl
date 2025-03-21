@@ -322,6 +322,9 @@
         #modal-donasi-konten .tombol-salin:hover{
           background-color: #00d1d1;
         }
+        .judul-file-download {
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -350,6 +353,21 @@
         </div>
          <button id="kembali-ke-list">Kembali</button>
     </div>
+     <!-- Kontainer untuk detail file -->
+    <div id="detail-file-container" style="display: none;">
+        <h2 class="judul-file-download"></h2>
+        <div class="info-count">
+            <!-- Info count untuk file (like, dll.) -->
+        </div>
+          <a id="download-link" href="#" download>
+              <button>Download File</button> <!-- Tombol Download -->
+          </a>
+        <div class="komentar-container">
+            <!-- Komentar untuk file -->
+        </div>
+        <button id="kembali-ke-list-file">Kembali</button>
+    </div>
+
     <div id='konten-utama'>
       <h1>TEMPLATE HTML</h1>
       <div id="container-utama"></div>
@@ -586,7 +604,7 @@
         tombolCopy.addEventListener('click', async () => {
             try {
                 await navigator.clipboard.writeText(item.kode);
-                gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
+                                gsap.to(tombolCopy, { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
                 alert('Kode berhasil disalin!');
 
                 const response = await fetch(`/api/kode/${item.id}/copy`, { method: 'POST' });
@@ -772,52 +790,32 @@
         }
         }
 
-        function buatKontainerFile(item) {
+    // --- FILE HANDLING ---
+
+    function buatKontainerFile(item) {
         const containerFile = document.getElementById('container-file');
         const kontainerFile = document.createElement('div');
         kontainerFile.classList.add('kontainer-file');
 
         const judulFile = document.createElement('h2');
-        judulFile.textContent = item.filename;
+        judulFile.textContent = item.filename; // Use filename as title
         judulFile.classList.add('judul-file');
         kontainerFile.appendChild(judulFile);
 
-        const fileLink = document.createElement('a');
-        fileLink.textContent = item.filename;
-        fileLink.href = '#';
-        fileLink.classList.add('file-link');
-
-        fileLink.addEventListener('click', async (event) => {
-            event.preventDefault();
-            try {
-                const shareResponse = await fetch(`/api/files/${item.id}/share`);
-                if (!shareResponse.ok) {
-                    const errorData = await shareResponse.json();
-                    throw new Error(errorData.message || 'Gagal mendapatkan URL share.');
-                }
-                const shareData = await shareResponse.json();
-
-                const modalShare = document.getElementById('modal-share');
-                const modalShareUrlInput = document.getElementById('modal-share-url');
-                    modalShareUrlInput.value = shareData.shareUrl;
-                    modalShare.style.display = 'block';
-
-                    document.querySelector('#modal-share .tombol-copy-url').onclick = () => {
-                      modalShareUrlInput.select();
-                      document.execCommand('copy');
-                      gsap.to(document.querySelector('#modal-share .tombol-copy-url'), { duration: 0.2, scale: 1.1, yoyo: true, repeat: 1 });
-                      alert('URL berhasil disalin!');
-                    };
 
 
-            } catch (error) {
-                console.error('Gagal mendownload atau mendapatkan URL share:', error);
-                alert('Terjadi kesalahan.');
-            }
+      const fileLink = document.createElement('a');
+      fileLink.textContent = item.filename; //  nama file
+      fileLink.classList.add('file-link');
 
-        });
+      //  download link
+      fileLink.href = `/download/${item.id}/${item.slug}`; // URL untuk download
+      fileLink.setAttribute('download', item.filename); //  download attribute
 
-        kontainerFile.appendChild(fileLink);
+
+      kontainerFile.appendChild(fileLink);
+
+
 
         const infoCount = document.createElement('div');
         infoCount.classList.add('info-count');
@@ -880,12 +878,214 @@
             }
         });
 
+      const komentarContainer = document.createElement('div');
+      komentarContainer.classList.add('komentar-container');
+
+      const komentarList = document.createElement('div'); // Container for comments
+      komentarList.classList.add('komentar-list');
+      komentarContainer.appendChild(komentarList);
+
+      const komentarForm = document.createElement('form');
+      komentarForm.classList.add('komentar-form');
+      komentarForm.innerHTML = `
+                <input type="text" name="author" placeholder="Nama Anda" required>
+                <textarea name="text" placeholder="Komentar Anda" required></textarea>
+                <button type="submit">Kirim Komentar</button>
+            `;
+
+        //  submit event untuk form komentar
+      komentarForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const author = komentarForm.elements.author.value;
+        const text = komentarForm.elements.text.value;
+
+        if (!author || !text) {
+          alert("Nama dan Komentar harus diisi!");
+          return; // Stop jika field kosong
+        }
+
+        try {
+          const response = await fetch(`/api/files/${item.id}/comments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ author, text }),
+          });
+
+          if (response.ok) {
+            const newComment = await response.json();
+             tampilkanKomentarFile(newComment, komentarList); // Tampilkan komentar
+            komentarForm.reset(); // Reset form
+
+            //  update comment count (optional)
+           // const commentCount = kontainerFile.querySelector('.comment-count'); // Asumsi ada elemen .comment-count
+           // if(commentCount) commentCount.textContent = parseInt(commentCount.textContent || 0) + 1;
+
+          } else {
+            const errorData = await response.json();
+            alert(errorData.message || "Gagal mengirim komentar");
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat mengirim komentar.');
+        }
+      });
+      komentarContainer.appendChild(komentarForm);
+
+
+      // Fungsi untuk menampilkan komentar
+      function tampilkanKomentarFile(comment, container) {
+        const komentarItem = document.createElement('div');
+        komentarItem.classList.add('komentar-item');
+        komentarItem.innerHTML = `
+                    <p class="komentar-author">${comment.author}</p>
+                    <p class="komentar-text">${comment.text}</p>
+                `;
+        container.appendChild(komentarItem); // Append ke container
+      }
+
+        //  ambil komentar
+        async function ambilKomentarFile(fileId, container) {
+            try{
+                const response = await fetch(`/api/files/${fileId}/comments`);
+                if(response.ok){
+                    const comments = await response.json();
+                    comments.forEach(comment => tampilkanKomentarFile(comment, container));
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'gagal mengambil komentar');
+                }
+
+            } catch(error){
+                console.error(error);
+                alert('Terjadi Error saat load komentar');
+            }
+        }
+
+      ambilKomentarFile(item.id, komentarList); // Panggil fungsi untuk mengambil komentar
+
         infoCount.appendChild(tombolShare);
         kontainerFile.appendChild(infoCount);
+        kontainerFile.appendChild(komentarContainer); // Add comment section
+
         containerFile.appendChild(kontainerFile);
+
 
         gsap.from(kontainerFile, { duration: 0.5, opacity: 0, y: 50, ease: "power2.out", delay: 0.2 });
         }
+
+      async function tampilkanDetailFile(id, slug) {
+          try {
+            const response = await fetch(`/api/files/${id}/share`);
+              if(!response.ok){
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal mengambil detail file.');
+              }
+              const {shareUrl} = await response.json();
+              const urlParts = shareUrl.split('/');
+              const fetchedId = urlParts[urlParts.length - 2];
+              const fetchedSlug = urlParts[urlParts.length - 1];
+
+              const detailResponse = await fetch(`/files/${fetchedId}/${fetchedSlug}`);
+              if(!detailResponse.ok) {
+                const errorData = await detailResponse.json();
+                throw new Error(errorData.message || 'Gagal Load File');
+              }
+
+              const fileItem = await detailResponse.json();
+
+              document.getElementById('konten-utama').style.display = 'none';
+              const detailContainer = document.getElementById('detail-file-container');
+              detailContainer.style.display = 'block';
+
+              // Set judul file
+              detailContainer.querySelector('.judul-file-download').textContent = fileItem.filename;
+
+              // Update info count (likes, dll) -  contoh, sesuaikan
+              const infoCount = detailContainer.querySelector('.info-count');
+              infoCount.innerHTML = `
+                    <span class="like-count"><i class="fas fa-thumbs-up"></i> ${fileItem.likes}</span>
+                    <span class="download-count"><i class="fas fa-download"></i> ${fileItem.downloadCount || 0}</span>
+                `; // Tambahkan download count
+
+              //  link download
+              const downloadLink = document.getElementById('download-link');
+              downloadLink.href = `/download/${fileItem.id}/${fileItem.slug}`; // Gunakan endpoint /download
+              downloadLink.download = fileItem.filename;
+
+
+              //  komentar
+              const komentarContainer = detailContainer.querySelector('.komentar-container');
+              komentarContainer.innerHTML = '';  // Kosongkan
+
+              const komentarList = document.createElement('div');
+              komentarList.classList.add('komentar-list');
+              komentarContainer.appendChild(komentarList);
+
+              const komentarForm = document.createElement('form');
+              komentarForm.classList.add('komentar-form');
+              komentarForm.innerHTML = `
+                    <input type="text" name="author" placeholder="Nama Anda" required>
+                    <textarea name="text" placeholder="Komentar Anda" required></textarea>
+                    <button type="submit">Kirim Komentar</button>
+                `;
+                komentarForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const author = komentarForm.elements.author.value;
+                const text = komentarForm.elements.text.value;
+                if (!author || !text) {
+                    alert("Nama dan Komentar Harus Di isi");
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/files/${fileItem.id}/comments`, { // Gunakan fileItem.id
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ author, text }),
+                    });
+
+                    if (response.ok) {
+                        const newComment = await response.json();
+                        tampilkanKomentarFile(newComment, komentarList);
+                        komentarForm.reset();
+                    } else {
+                         const errorData = await response.json();
+                         alert(errorData.message || 'Gagal Mengirim komentar.');
+                    }
+
+                  } catch(error){
+                      console.error(error);
+                      alert('Terjadi error saat mengirim komentar.');
+                  }
+                });
+                komentarContainer.appendChild(komentarForm);
+
+
+                //  ambil komentar
+              async function ambilKomentarFile(fileId, container) {
+                  try {
+                      const response = await fetch(`/api/files/${fileId}/comments`); // Gunakan fileId (bukan kodeId)
+                      if (response.ok) {
+                          const comments = await response.json();
+                          comments.forEach(comment => tampilkanKomentarFile(comment, container));
+                      } else {
+                          const errorData = await response.json();
+                          throw new Error(errorData.message || 'Gagal mengambil komentar file.');
+                      }
+                  } catch (error) {
+                      console.error('Error:', error);
+                  }
+              }
+              ambilKomentarFile(fileItem.id, komentarList); // Gunakan fileItem.id
+
+
+          } catch(error) {
+              console.error('Gagal Load Detail file', error);
+              alert('Gagal Load Detail File');
+          }
+      }
+
 
 
         async function ambilDataFile() {
@@ -910,35 +1110,62 @@
         return '127.0.0.1';
         }
 
-        function cekUrlDanTampilkanDetail() {
-          const path = window.location.pathname;
-          const parts = path.split('/');
-          if (parts.length === 4 && parts[1] === 'kode') {
-            const id = parseInt(parts[2], 10);
-            const slug = parts[3];
-            if (!isNaN(id)) {
-              tampilkanDetailKode(id, slug);
-              return;
+      function cekUrlDanTampilkanDetail() {
+        const path = window.location.pathname;
+        const parts = path.split('/');
+
+        if (parts.length === 4) {
+            if (parts[1] === 'kode') {
+                const id = parseInt(parts[2], 10);
+                const slug = parts[3];
+                if (!isNaN(id)) {
+                    tampilkanDetailKode(id, slug);
+                    return;
+                }
+            } else if (parts[1] === 'files') { //  untuk files
+                const id = parseInt(parts[2], 10);
+                const slug = parts[3];
+                if (!isNaN(id)) {
+                    tampilkanDetailFile(id, slug); // Panggil tampilkanDetailFile
+                    return;
+                }
             }
-          }
-            ambilDataKode();
-            ambilDataFile();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        //  default, tampilkan list
+        ambilDataKode();
+        ambilDataFile();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
         cekUrlDanTampilkanDetail();
+
         const kembaliKeListButton = document.getElementById('kembali-ke-list');
-        if(kembaliKeListButton){
+        if (kembaliKeListButton) {
             kembaliKeListButton.addEventListener('click', () => {
-              document.getElementById('detail-kode-container').style.display = 'none';
-              document.getElementById('konten-utama').style.display = 'block';
-               history.pushState(null, null, '/');
+                document.getElementById('detail-kode-container').style.display = 'none';
+                 document.getElementById('detail-file-container').style.display = 'none'; // Sembunyikan detail file
+                document.getElementById('konten-utama').style.display = 'block';
+                history.pushState(null, null, '/');
                 ambilDataKode();
                 ambilDataFile();
-
-          });
+            });
         }
-        });
+
+        //  event listener untuk tombol "Kembali" pada detail file
+        const kembaliKeListFileButton = document.getElementById('kembali-ke-list-file');
+        if (kembaliKeListFileButton) {
+            kembaliKeListFileButton.addEventListener('click', () => {
+                document.getElementById('detail-file-container').style.display = 'none'; // Sembunyikan detail
+                document.getElementById('detail-kode-container').style.display = 'none';
+                document.getElementById('konten-utama').style.display = 'block'; // Tampilkan konten utama
+                 history.pushState(null, null, '/');
+                ambilDataKode();
+                ambilDataFile();
+            });
+        }
+    });
 
     </script>
 </body>
