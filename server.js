@@ -1,3 +1,4 @@
+// --- (Previous code from your server.js) ---
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
@@ -274,7 +275,8 @@ app.post('/api/files', upload.single('file'), async (req, res) => {
             size: req.file.size,
             likedBy: [],
             slug: slugify(req.file.originalname), // Tambahkan slug untuk file
-            judul: judulFile
+            judul: judulFile,
+            comments: [], // Initialize comments array for files
         };
         data.files.push(newFile);
         await simpanData(data);
@@ -444,6 +446,8 @@ app.get('/download/:id/:slug', async (req, res) => { // Gunakan route yang berbe
             console.error("File does not exist on the filesystem:", filePath);
             return res.status(404).send('File not found on server.');
         }
+
+        // Gunakan res.download() untuk mengirim file.
         res.download(filePath, file.filename, (err) => {
             if (err) {
                 // Tangani error *setelah* mencoba mengirim header
@@ -462,5 +466,62 @@ app.get('/download/:id/:slug', async (req, res) => { // Gunakan route yang berbe
     }
 });
 
+// --- File Comment Endpoints ---
+
+// GET comments for a file
+app.get('/api/files/:id/comments', async (req, res) => {
+    const fileId = parseInt(req.params.id, 10);
+    try {
+        const data = await bacaData();
+        const file = data.files.find(f => f.id === fileId);
+        if (!file) {
+            return res.status(404).json({ message: 'File not found.' });
+        }
+        res.json(file.comments); // Return the comments array
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve comments.', error: error.message || error });
+    }
+});
+
+// POST a new comment to a file
+app.post('/api/files/:id/comments', async (req, res) => {
+    const fileId = parseInt(req.params.id, 10);
+    const { author, text } = req.body;
+
+    // Input validation
+    if (!author || !text) {
+        return res.status(400).json({ message: 'Author and comment text are required.' });
+    }
+    if (typeof author !== 'string' || typeof text !== 'string') {
+        return res.status(400).json({ message: 'Author and comment text must be strings.' });
+    }
+    if (author.length > 255 || text.length > 65535) {
+        return res.status(400).json({ message: 'Author name or comment text too long.' });
+    }
+
+    try {
+        const data = await bacaData();
+        const file = data.files.find(f => f.id === fileId);
+        if (!file) {
+            return res.status(404).json({ message: 'File not found.' });
+        }
+
+        const newComment = {
+            id: Date.now(), // Unique ID for the comment
+            author,
+            text,
+            timestamp: Date.now(),
+        };
+
+        file.comments.push(newComment); // Add to the file's comments array
+        await simpanData(data); // Save changes
+        res.status(201).json(newComment); // Return the new comment
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to add comment.', error: error.message || error });
+    }
+});
 
 app.listen(port, () => { console.log(`Server berjalan di http://localhost:${port}`); });
