@@ -178,7 +178,7 @@
     .kontainer-kode .tombol-copy {
         position: absolute;
         top: 15px;
-        right: 15px;
+        right: 50px; /* Beri jarak untuk tombol preview */
         background-color: #00ffff;
         color: #000;
         border: none;
@@ -696,16 +696,14 @@
         animation: neonGlow 2s ease-in-out infinite alternate;
     }
 
-    #detail-kode-container pre {
+       #detail-kode-container pre {
         white-space: pre-wrap;
         word-wrap: break-word;
         font-size: 1.1rem;
         color: #eee;
         line-height: 1.6;
          position: relative; /* Penting untuk ::before */
-
     }
-
 
     #detail-kode-container .info-count {
         margin-top: 1.5rem;
@@ -974,6 +972,26 @@
 </head>
 <body>
     <div id="particles-js"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div id="loading-progress">
+            <div id="progress-bar"></div>
+            <div id="progress-text">0%</div>
+        </div>
+    </div>
+
+    <!-- SweetAlert untuk Selamat Datang -->
+    <div id="welcome-alert" class="modal">
+        <div class="modal-konten">
+            <h2>Selamat Datang!</h2>
+            <p>Selamat datang di website share code by wanzofc</p>
+            <button id="welcome-ok-button">Oke</button>
+        </div>
+    </div>
+
+
     <button class="tombol-request" onclick="window.location.href='https://wanzofc-ai.biz.id'">
         <i class="fas fa-inbox"></i> REQ
     </button>
